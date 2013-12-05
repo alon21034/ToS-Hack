@@ -12,9 +12,9 @@ y=`grep ABS_MT_POSITION_Y tmp | grep 'max [0-9]\+' -o | grep '[0-9]\+' -o`
 adb shell screencap -p /sdcard/screen.png
 adb pull /sdcard/screen.png
 
-java -jar Main.jar screen.png
+java -cp ./Tos-Hack/bin Main screen.png
 
-./data/algorithm -q1000000 < board > step
+./data/algorithm -v < board > step
 
 echo "$x $y" | ./data/generateTrace $eventnum
 

@@ -244,7 +244,7 @@ struct Solver {
     }
 
     if (verbose) {
-      cout << "max possible combo: " << board.combo_upper_bound() << endl;
+      clog << "max possible combo: " << board.combo_upper_bound() << endl;
     }
   }
 
@@ -258,8 +258,8 @@ struct Solver {
 
     set<pair<string, pair<int, int> > > visited;
 
-    for (int r = 0; r < NROW; ++ r) {
-      for (int c = 0; c < NCOL; ++ c) {
+    for (int c = NCOL - 1; c >= 0; -- c) {
+      for (int r = NROW - 1; r >= 0; -- r) {
         que.push_back(Step(0, board.dup(), make_pair(r, c), -1));
       }
     }
@@ -273,14 +273,14 @@ struct Solver {
         max_combo = max_combo_local;
         current_max_step = que[i].steps;
         if (verbose) {
-          cout << current_max_step << endl;
+          clog << current_max_step << endl;
         }
       }
 
       int combo = que[i].board.compute_combo();
       if (combo > max_combo_local) {
         if (verbose) {
-          cout << "current max combo = " << combo << endl;
+          clog << "current max combo = " << combo << endl;
         }
         max_combo_local = combo;
 
@@ -333,8 +333,8 @@ struct Solver {
 
     max_combo = max_combo_local;
     if (verbose) {
-      cout << "queue size: " << que.size() << endl;
-      cout << "visited node: " << visited.size() << endl;
+      clog << "queue size: " << que.size() << endl;
+      clog << "visited node: " << visited.size() << endl;
     }
     return max_combo;
   }
@@ -361,7 +361,7 @@ int main(int argc, char* argv[]) {
   int max_combo = solver.solve(result);
 
   if (verbose) {
-    cout << "max combo found: " << max_combo << endl;
+    clog << "max combo found: " << max_combo << endl;
   }
 
   for (int i = result.size() - 1; i >= 0; -- i) {
