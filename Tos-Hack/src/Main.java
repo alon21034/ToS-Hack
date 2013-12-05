@@ -33,7 +33,11 @@ public class Main {
 	
 	
 	public static void main(String[] str) {
-		Main main = new Main(str[0]);
+		if (str == null || str.length == 0) {
+			Main main = new Main("screen.png");
+		} else {
+			Main main = new Main(str[0]);
+		}
 	}
 	
 	public Main(String path) {
@@ -59,8 +63,10 @@ public class Main {
 		// p(a, b) = (p+2p, 1200 - (9-2*b)*p)
 		for (int i = 0 ; i < 6 ; i++) {
 			for (int j = 0 ; j < 5 ; j++) {
-				int w = (int)((1+2*i)*p);
-				int h = (int)(1200 - (9-2*j)*p);
+				// int w = (int)((1+2*i)*p);
+				int w =  WIDTH/12 + WIDTH*i/6;
+				int h = HEIGHT - HEIGHT/16 -WIDTH/12 - (4-j) * WIDTH/6;
+				// int h = (int)(HEIGHT-HEIGHT/16 - (9-2*j)*p);
 				
 				int r=0, g=0, b=0;
 				for (int m = -7 ; m < 8 ; m++) {
@@ -92,8 +98,10 @@ public class Main {
 	        for (int i = 0 ; i < 5 ; ++i) {
 	        	for (int j = 0 ; j < 6 ; ++j) {
 	        		out.print(TypeToChar(res[j][i]) + "  ");
+	        		System.out.print(TypeToChar(res[j][i]) + "  ");
 	        	}
 	        	out.print("\n");
+	        	_("");
 	        }
 	        out.close();
         } catch (FileNotFoundException e) {
