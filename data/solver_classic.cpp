@@ -266,9 +266,11 @@ struct Solver {
 
     int combo_upper_bound = board.combo_upper_bound();
     int max_combo = 0;
+    int max_combo_local = 0;
     int current_max_step = 0;
     for (int i = 0; i < que.size(); ++ i) {
       if (current_max_step < que[i].steps) {
+        max_combo = max_combo_local;
         current_max_step = que[i].steps;
         if (verbose) {
           cout << current_max_step << endl;
@@ -276,11 +278,11 @@ struct Solver {
       }
 
       int combo = que[i].board.compute_combo();
-      if (combo > max_combo) {
+      if (combo > max_combo_local) {
         if (verbose) {
           cout << "current max combo = " << combo << endl;
         }
-        max_combo = combo;
+        max_combo_local = combo;
 
         result.clear();
         for (int v = i; v != -1; v = que[v].from) {
@@ -294,7 +296,7 @@ struct Solver {
 
       if (que[i].steps == max_step ||
           que.size() > que_limit ||
-          (combo * PRUNE_RATIO_DEN < max_combo * PRUNE_RATIO_NUM)) {
+          (combo * PRUNE_RATIO_DEN < max_combo_local * PRUNE_RATIO_NUM)) {
         continue;
       }
 
@@ -329,6 +331,7 @@ struct Solver {
       }
     }
 
+    max_combo = max_combo_local;
     if (verbose) {
       cout << "queue size: " << que.size() << endl;
       cout << "visited node: " << visited.size() << endl;
