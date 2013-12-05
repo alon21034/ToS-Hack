@@ -1,24 +1,30 @@
 echo "Hello!!"
 
+
 echo "Get touch screen handler"
 adb shell cat /proc/bus/input/devices > handlerList
-
 eventnum=`grep touchscreen -A 5 handlerList | grep 'event[0-9]\+' -o | grep '[0-9]\+' -o`
 adb shell getevent -lp /dev/input/event$eventnum > tmp
-
 x=`grep ABS_MT_POSITION_X tmp | grep 'max [0-9]\+' -o | grep '[0-9]\+' -o`
 y=`grep ABS_MT_POSITION_Y tmp | grep 'max [0-9]\+' -o | grep '[0-9]\+' -o`
 
-adb shell screencap -p /sdcard/screen.png
-adb pull /sdcard/screen.png
+for ((index=0; index<$1; index++)); 
+do
 
-java -cp Tos-Hack/bin/ Main screen.png
+	adb shell screencap -p /sdcard/screen.png
+	adb pull /sdcard/screen.png
 
-./data/algorithm -q1000000 < board > step
+	java -cp Tos-Hack/bin/ Main screen.png
 
-echo "$x $y" | ./data/generateTrace $eventnum
+	./data/algorithm -q1000000 < board > step
 
-adb push ./test.sh  /sdcard/test.sh
-adb shell sh /sdcard/test.sh
+	echo "$x $y" | ./data/generateTrace $eventnum
 
+	adb push ./test.sh  /sdcard/test.sh
+	adb shell sh /sdcard/test.sh
+
+	echo "$index done"
+	echo "wait..."
+	sleep 30
+done
 
