@@ -16,11 +16,11 @@ public class Main {
 		Fire, SFire,
 		Wood, SWood,
 		Water, SWater,
-		
+
 		Unknown
 		// need add unknown
 	}
-	
+
 	final int[][] values = {
 			{54, 19, 38}, {62, 44, 49}, // Heart
 			{50, 37, 0}, {61, 50, 14}, // Light
@@ -29,15 +29,12 @@ public class Main {
 			{6, 43, 8}, {10, 58, 12}, // Wood
 			{15, 38, 51}, {33, 53, 62}  // Water
 	};
-	
-	
-	
+
 	public static void main(String[] str) {
 		Main main = new Main(str[0]);
 	}
-	
+
 	public Main(String path) {
-		
 		// read image.
 		BufferedImage img = null;
 		try {
@@ -45,14 +42,14 @@ public class Main {
         } catch (IOException e) {
 	        e.printStackTrace();
         }
-	
+
 		int res[][] = new int[6][5];
-		
+
 		// show color
 		int WIDTH = img.getWidth();
 		int HEIGHT = img.getHeight();
 		_("width:" + WIDTH + "   height:" + HEIGHT);
-		
+
 		float p = (float)WIDTH / 12; // half of one slot.
 		// p(0,0) to p(5, 4)
 		// p(0,0) = (p, 1280 - 80 -9*p)
@@ -61,7 +58,7 @@ public class Main {
 			for (int j = 0 ; j < 5 ; j++) {
 				int w = (int)((1+2*i)*p);
 				int h = (int)(1200 - (9-2*j)*p);
-				
+
 				int r=0, g=0, b=0;
 				for (int m = -7 ; m < 8 ; m++) {
 					for (int n = -7 ; n < 8 ; n++) {
@@ -74,21 +71,17 @@ public class Main {
 				r/=225;
 				g/=225;
 				b/=225;
-				
+
 //				_("(" + i + " ," + j+ "): " + r + " " + g + " " + b);
-				
+
 				res[i][j] = (getType(new int[]{r,g,b}));
 			}
 		}
-		
+
 		PrintWriter out;
         try {
 	        out = new PrintWriter("board");
-	        
-	        out.println("30");
-	        out.println("200000");
-	        out.println("4");
-	        
+
 	        for (int i = 0 ; i < 5 ; ++i) {
 	        	for (int j = 0 ; j < 6 ; ++j) {
 	        		out.print(TypeToChar(res[j][i]) + "  ");
@@ -100,19 +93,19 @@ public class Main {
 	        // TODO Auto-generated catch block
 	        e.printStackTrace();
         }
-		
+
 	}
-	
+
 	public int getType(int[] input){
-		
+
 		int min = 0, mindiff = 1000;
 		for (int i = 0 ; i < 12 ; i ++) {
 			int[] ans = values[i];
-			
+
 			int diff = 0;
 			for (int j = 0 ; j < 3 ; j++)
 				diff += Math.abs(input[j] - ans[j]);
-			
+
 			if (diff < mindiff) {
 				min = i;
 				mindiff = diff;
@@ -120,27 +113,27 @@ public class Main {
 		}
 		return min;
 	}
-	
+
 	public void _(String str) {
 		System.out.print(str+"\n");
 	}
-	
+
 	public int getA(int color) {
 		return (color&0xff000000) >> 24;
 	}
-	
+
 	public int getR(int color) {
 		return (color&0x00fc0000) >> 18;
 	}
-	
+
 	public int getG(int color) {
 		return (color&0x0000fc00) >> 10;
 	}
-	
+
 	public int getB(int color) {
 		return (color&0x000000fc) >> 2;
 	}
-	
+
 	public Type intToType(int n) {
 		switch (n) {
 		case 0: return Type.Heart;
@@ -158,7 +151,7 @@ public class Main {
 		default: return Type.Unknown;
 		}
 	}
-	
+
 	public char TypeToChar(int n){
 		switch (n) {
 		case 0: return '0';
