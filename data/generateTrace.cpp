@@ -7,7 +7,7 @@ using namespace std;
 int main() {
 
 	ifstream inFile("../step");
-	ofstream outFile("test.sh");
+	ofstream outFile("../test.sh");
 
 	// start
 	outFile << "sendevent /dev/input/event0 0003 $((0x0039)) $((0x00000154))" << endl;
