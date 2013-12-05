@@ -3,8 +3,11 @@
 #include <iomanip>
 #include <set>
 #include <utility>
+#include <cstdlib>
 
 using namespace std;
+
+int verbose = 0;
 
 struct Board {
 #define NROW 5
@@ -193,7 +196,8 @@ struct Solver {
 
   int MAX_STEP;
   int QUE_LIMIT;
-  int PRUNE_RATIO;
+  int PRUNE_RATIO_NUM;
+  int PRUNE_RATIO_DEN;
 
   typedef vector<pair<int, int> > Result;
 
@@ -203,8 +207,33 @@ struct Solver {
 
   }
 
-  Solver& read() {
-    cin >> MAX_STEP >> QUE_LIMIT >> PRUNE_RATIO;
+  Solver& read(int argc, char* argv[]) {
+    MAX_STEP = 30;
+    QUE_LIMIT = 1000000;
+    PRUNE_RATIO_NUM = 2;
+    PRUNE_RATIO_DEN = 3;
+
+    for (int i = 1; i < argc; ++ i) {
+      if (argv[i][0] == '-') {
+        switch (argv[i][1]) {
+          case 's': // max step
+            MAX_STEP = atoi(argv[i] + 2);
+            break;
+          case 'q': // queue limit
+            QUE_LIMIT = atoi(argv[i] + 2);
+            break;
+          case 'n': // PRUNE_RATIO_NUM
+            PRUNE_RATIO_NUM = atoi(argv[i] + 2);
+            break;
+          case 'd': // PRUNE_RATIO_DEN
+            PRUNE_RATIO_DEN = atoi(argv[i] + 2);
+            break;
+          case 'v':
+            verbose = 1;
+            break;
+        }
+      }
+    }
 
     for (int r = 0; r < NROW; ++ r) {
       for (int c = 0; c < NCOL; ++ c) {
@@ -214,7 +243,9 @@ struct Solver {
       }
     }
 
-    //cout << "max possible combo: " << board.combo_upper_bound() << endl;
+    if (verbose) {
+      cout << "max possible combo: " << board.combo_upper_bound() << endl;
+    }
   }
 
   int solve(Result& result) {
@@ -239,21 +270,21 @@ struct Solver {
     for (int i = 0; i < que.size(); ++ i) {
       if (current_max_step < que[i].steps) {
         current_max_step = que[i].steps;
-        //cout << current_max_step << endl;
+        if (verbose) {
+          cout << current_max_step << endl;
+        }
       }
 
       int combo = que[i].board.compute_combo();
       if (combo > max_combo) {
-        //cout << "max_combo = " << combo << endl;
+        if (verbose) {
+          cout << "current max combo = " << combo << endl;
+        }
         max_combo = combo;
 
         result.clear();
         for (int v = i; v != -1; v = que[v].from) {
           result.push_back(que[v].cursor);
-        }
-
-        for (int i = result.size() - 1; i >= 0; -- i) {
-          //cout << result[i].first << ' ' << result[i].second << endl;
         }
 
         if (combo == combo_upper_bound) {
@@ -263,7 +294,7 @@ struct Solver {
 
       if (que[i].steps == max_step ||
           que.size() > que_limit ||
-          (combo * PRUNE_RATIO < max_combo /* && que[i].steps > 1 */)) {
+          (combo * PRUNE_RATIO_DEN < max_combo * PRUNE_RATIO_NUM)) {
         continue;
       }
 
@@ -298,8 +329,10 @@ struct Solver {
       }
     }
 
-    //cout << "queue size: " << que.size() << endl;
-    //cout << "visited node: " << visited.size() << endl;
+    if (verbose) {
+      cout << "queue size: " << que.size() << endl;
+      cout << "visited node: " << visited.size() << endl;
+    }
     return max_combo;
   }
 
@@ -318,13 +351,15 @@ struct Solver {
 
 int main(int argc, char* argv[]) {
   Solver solver;
-  solver.read();
+  solver.read(argc, argv);
 
   Solver::Result result;
 
   int max_combo = solver.solve(result);
 
-  //cout << "max combo found: " << max_combo << endl;
+  if (verbose) {
+    cout << "max combo found: " << max_combo << endl;
+  }
 
   for (int i = result.size() - 1; i >= 0; -- i) {
     cout << result[i].first << ' ' << result[i].second << endl;
