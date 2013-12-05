@@ -84,6 +84,11 @@ public class Main {
 		PrintWriter out;
         try {
 	        out = new PrintWriter("board");
+	        
+	        out.println("30");
+	        out.println("200000");
+	        out.println("4");
+	        
 	        for (int i = 0 ; i < 5 ; ++i) {
 	        	for (int j = 0 ; j < 6 ; ++j) {
 	        		out.print(TypeToChar(res[j][i]) + "  ");
