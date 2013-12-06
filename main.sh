@@ -7,8 +7,9 @@ adb shell getevent -lp /dev/input/event$eventnum > tmp
 x=`grep ABS_MT_POSITION_X tmp | grep 'max [0-9]\+' -o | grep '[0-9]\+' -o`
 y=`grep ABS_MT_POSITION_Y tmp | grep 'max [0-9]\+' -o | grep '[0-9]\+' -o`
 
-for ((index=0; index<$1; index++)); 
+while [ "$yn" != "yes" -a "$yn" != "YES" ]
 do
+	echo "start"
 	adb shell screencap -p /sdcard/screen.png
 	adb pull /sdcard/screen.png
 
@@ -23,6 +24,8 @@ do
 
 	echo "$index done"
 	echo "wait..."
-	sleep 30
+
+	read -p "Please input yes/YES to stop this program: " yn
 done
+
 
