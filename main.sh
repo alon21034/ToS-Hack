@@ -7,11 +7,12 @@ adb shell getevent -lp /dev/input/event$eventnum > tmp
 x=`grep ABS_MT_POSITION_X tmp | grep 'max [0-9]\+' -o | grep '[0-9]\+' -o`
 y=`grep ABS_MT_POSITION_Y tmp | grep 'max [0-9]\+' -o | grep '[0-9]\+' -o`
 
-while [ "$yn" != "yes" -a "$yn" != "YES" ]
-do
+adb shell screencap -p /sdcard/screen.png
+adb pull /sdcard/screen.png
+
+for (( i = 0; i < $1; i++ )); do
 	echo "start"
-	adb shell screencap -p /sdcard/screen.png
-	adb pull /sdcard/screen.png
+	
 
 	java -cp ./Tos-Hack/bin Main screen.png
 
@@ -22,10 +23,23 @@ do
 	adb push ./test.sh  /sdcard/test.sh
 	adb shell sh /sdcard/test.sh
 
-	echo "$index done"
+	echo "$i done"
+
 	echo "wait..."
 
-	read -p "Please input yes/YES to stop this program: " yn
+
+	sleep 10
+	echo "check stable"
+	stable=`sh script/check_stable.sh`
+	echo "stable: $stable"
+	
+	while [[ "$stable" == "0" ]]; do
+		echo "wait until stable"
+		sleep 2
+		stable=`sh script/check_stable.sh`
+	done
+
+	#read -p "Please input yes/YES to stop this program: " yn
 done
 
 

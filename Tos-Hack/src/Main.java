@@ -83,9 +83,11 @@ public class Main {
 //				_("(" + i + " ," + j+ "): " + r + " " + g + " " + b);
 
 				res[i][j] = (getType(new int[]{r,g,b}));
-				_("total diff = " + totalDiff);
+
 			}
 		}
+
+		_("total diff = " + totalDiff);
 
 		PrintWriter out;
         try {

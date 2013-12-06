@@ -1,11 +1,14 @@
 adb shell screencap -p /sdcard/screen.png
 adb pull /sdcard/screen.png
 
-java -cp ./Tos-Hack/bin Main screen.png > board1
+java -cp ./Tos-Hack/bin Main screen.png > total_diff
 
-adb shell screencap -p /sdcard/screen.png
-adb pull /sdcard/screen.png
+diff=`grep 'diff = [0-9]\+' total_diff | grep '[0-9]\+' -o`
 
-java -cp ./Tos-Hack/bin Main screen.png > board2
+#echo "diff = $diff"
 
-diff board1 board2
+if (( "$diff" < 400 )); then
+  echo "1"
+else
+  echo "0"
+fi
