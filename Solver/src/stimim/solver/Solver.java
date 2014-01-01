@@ -104,12 +104,10 @@ public class Solver {
 
     logger.log(level, String.format("nCreated = %d\n", nCreated));
     logger.log(level, String.format("combos: %d (%d)\n", best.combo, comboUpperBound));
-    /*
-    best.board.print();
+    best.board.print(logger, level);
     Board t = best.board.dup();
     t.computeComboAndRemove();
-    t.print();
-    */
+    t.print(logger, level);
     return best.combo;
   }
 

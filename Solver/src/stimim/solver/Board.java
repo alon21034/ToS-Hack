@@ -2,6 +2,8 @@ package stimim.solver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Board {
   public static final int NROW = 5;
@@ -169,18 +171,19 @@ public class Board {
     public static int NCOLORS = 6; 
   }
 
-  public void print() {
-    System.out.println("-----------");
+  public void print(Logger logger, Level level) {
+    String msg = "\n-----------\n";
     for (int r = 0; r < NROW; ++ r) {
       for (int c = 0; c < NCOL; ++ c) {
         if (data[to_index(r, c)] != Gem.NOTHING) {
-          System.out.printf("%d ", data[to_index(r, c)].ordinal());
+          msg += String.format("%d ", data[to_index(r, c)].ordinal());
         } else {
-          System.out.printf("  ");
+          msg += "  ";
         }
       }
-      System.out.println();
+      msg += "\n";
     }
-    System.out.println("-----------");
+    msg += "-----------";
+    logger.log(level, msg);
   }
 }
