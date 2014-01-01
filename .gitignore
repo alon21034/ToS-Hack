@@ -23,5 +23,5 @@ list1
 list2
 tmp
 data/tmp.cppSolver/bin/
-Solver/bin_test/
 Solver/bin/
+SolverTest/bin/
