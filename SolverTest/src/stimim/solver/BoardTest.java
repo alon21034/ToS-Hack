@@ -4,7 +4,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import stimim.solver.Board;
 import stimim.solver.Board.Gem;
 
 public class BoardTest {
@@ -43,17 +42,17 @@ public class BoardTest {
     Assert.assertEquals(3, board.computeComboAndRemove());
     Assert.assertEquals("666666666666666666666666666100", board.toString());
   }
-  
+
   @Test
   public void testToString() {
     Board board = new Board();
 
     int[] data = new int[] {
-            6, 2, 6, 6, 6, 6,
-            6, 2, 1, 6, 6, 6,
-            6, 1, 1, 1, 6, 6,
-            6, 2, 1, 6, 6, 6,
-            6, 6, 6, 6, 6, 6,
+        6, 2, 6, 6, 6, 6,
+        6, 2, 1, 6, 6, 6,
+        6, 1, 1, 1, 6, 6,
+        6, 2, 1, 6, 6, 6,
+        6, 6, 6, 6, 6, 6,
     };
 
     setBoard(board, data);
