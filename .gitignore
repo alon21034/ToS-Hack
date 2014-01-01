@@ -22,4 +22,6 @@ handlerList
 list1
 list2
 tmp
-data/tmp.cpp
+data/tmp.cppSolver/bin/
+Solver/bin_test/
+Solver/bin/
