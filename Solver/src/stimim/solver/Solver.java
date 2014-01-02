@@ -23,7 +23,7 @@ public class Solver {
         new Comparator<Step>() {
           @Override
           public int compare(Step a, Step b) {
-            return -Double.compare(a.ratio, b.ratio);
+            return -Double.compare(a.score, b.score);
           }
         };
     PriorityQueue<Step> queue =
@@ -147,7 +147,7 @@ public class Solver {
     public final int r;
     public final int c;
     public final int moves;
-    public final double ratio;
+    public final double score;
 
     Step(Board board, Step prev, int r, int c) {
       this.board = board;
@@ -156,12 +156,16 @@ public class Solver {
       this.r = r;
       this.c = c;
       this.moves = prev != null ? prev.moves + 1 : 1;
-      ratio = (double) this.combo / this.moves;
+      score = computeScore();
     }
 
     @Override
     public String toString() {
       return String.format("%s#%d#%d", board.toString(), r, c);
+    }
+
+    public double computeScore() {
+      return Math.pow(combo, 1) / Math.pow(moves, 2);
     }
   }
 }
