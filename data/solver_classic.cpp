@@ -69,7 +69,7 @@ struct Board {
     }
 
     int acc = 0;
-    for (int i = 0; i < 5; ++ i) {
+    for (int i = 0; i < 7; ++ i) {
       acc += count[i] / 3;
     }
     return acc;
@@ -254,10 +254,8 @@ struct Solver {
 
   int try_make_combo(Result& result, int max_step, int que_limit) {
     vector<Step> que;
+
     que.clear();
-
-    set<pair<string, pair<int, int> > > visited;
-
     for (int c = NCOL - 1; c >= 0; -- c) {
       for (int r = NROW - 1; r >= 0; -- r) {
         que.push_back(Step(0, board.dup(), make_pair(r, c), -1));
@@ -268,6 +266,8 @@ struct Solver {
     int max_combo = 0;
     int max_combo_local = 0;
     int current_max_step = 0;
+    set<pair<string, pair<int, int> > > visited;
+    visited.clear();
     for (int i = 0; i < que.size(); ++ i) {
       if (current_max_step < que[i].steps) {
         max_combo = max_combo_local;
@@ -290,13 +290,15 @@ struct Solver {
         }
 
         if (combo == combo_upper_bound) {
+          clog << "reach combo upper bound" << endl;
           break;
         }
       }
 
       if (que[i].steps == max_step ||
           que.size() > que_limit ||
-          (combo * PRUNE_RATIO_DEN < max_combo_local * PRUNE_RATIO_NUM)) {
+          (combo * PRUNE_RATIO_DEN < max_combo_local * PRUNE_RATIO_NUM &&
+              max_combo_local > 3)) {
         continue;
       }
 
@@ -326,6 +328,7 @@ struct Solver {
           if (visited.find(make_pair(b.hash(), make_pair(nr, nc))) == visited.end()) {
             que.push_back(Step(que[i].steps + 1, b, make_pair(nr, nc), i));
             visited.insert(make_pair(b.hash(), make_pair(nr, nc)));
+            // clog << "add " << b.hash() << ' ' << nr << ' ' << nc << endl;
           }
         }
       }
