@@ -13,6 +13,8 @@ adb pull /sdcard/screen.png
 for (( i = 0; i < $1; i++ )); do
 	echo "start"
 	
+	adb shell screencap -p /sdcard/screen.png
+	adb pull /sdcard/screen.png
 
 	java -cp ./Tos-Hack/bin Main screen.png
 
@@ -27,19 +29,7 @@ for (( i = 0; i < $1; i++ )); do
 
 	echo "wait..."
 
-
-	sleep 10
-	echo "check stable"
-	stable=`sh script/check_stable.sh`
-	echo "stable: $stable"
-	
-	while [[ "$stable" == "0" ]]; do
-		echo "wait until stable"
-		sleep 2
-		stable=`sh script/check_stable.sh`
-	done
-
-	#read -p "Please input yes/YES to stop this program: " yn
+	sleep 20
 done
 
 
