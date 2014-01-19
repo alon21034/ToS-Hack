@@ -5,17 +5,19 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import stimim.solver.GemUtil.BaseGem;
+
 public class Board {
   public static final int NROW = 5;
   public static final int NCOL = 6;
 
-  private final Gem[] data = new Gem[NROW * NCOL];
+  private final int[] data = new int[NROW * NCOL];
 
-  public Gem get(int r, int c) {
+  public int get(int r, int c) {
     return data[r * NCOL + c];
   }
 
-  public Board set(int r, int c, Gem g) {
+  public Board set(int r, int c, int g) {
     data[r * NCOL + c] = g;
     return this;
   }
@@ -29,12 +31,13 @@ public class Board {
   }
 
   public int computeComboUpperBound() {
-    int[] counter = new int[Gem.NCOLORS];
+    int[] counter = new int[GemUtil.N_COLOR];
 
-    for (Gem g : data) {
-      if (g.ordinal() < Gem.NCOLORS) {
-        counter[g.ordinal()]++;
+    for (int g : data) {
+      if (GemUtil.isUnknownOrNothing(g)) {
+        continue;
       }
+      counter[GemUtil.getBaseGem(g).ordinal()]++;
     }
 
     int acc = 0;
@@ -44,42 +47,44 @@ public class Board {
     return acc;
   }
 
-  public int computeComboAndRemove() {
+  public int computeComboAndRemove(Damages damages) {
     int acc = 0;
     int count;
 
-    while ((count = remove_connects()) > 0) {
+    while ((count = remove_connects(damages)) > 0) {
       acc += count;
     }
     return acc;
   }
 
-  public int computeCombo() {
-    return dup().computeComboAndRemove();
+  public int computeCombo(Damages damages) {
+    return dup().computeComboAndRemove(damages);
   }
 
-  private int remove_connects() {
+  private int remove_connects(Damages damages) {
     int count = 0;
     boolean[] to_remove = new boolean[data.length];
 
     // mark to_remove
     for (int r = 0; r < NROW; ++r) {
       for (int c = 0; c < NCOL; ++c) {
-        Gem g = get(r, c);
+        int g = get(r, c);
 
-        if (g == Gem.NOTHING) {
+        if (GemUtil.isUnknownOrNothing(g)) {
           continue;
         }
 
         if (c + 2 < NCOL) {
-          if (g == get(r, c + 1) && g == get(r, c + 2)) {
+          if (GemUtil.getBaseGem(g) == GemUtil.getBaseGem(get(r, c + 1)) &&
+              GemUtil.getBaseGem(g) == GemUtil.getBaseGem(get(r, c + 2))) {
             to_remove[r * NCOL + c] = true;
             to_remove[r * NCOL + c + 1] = true;
             to_remove[r * NCOL + c + 2] = true;
           }
         }
         if (r + 2 < NROW) {
-          if (g == get(r + 1, c) && g == get(r + 2, c)) {
+          if (GemUtil.getBaseGem(g) == GemUtil.getBaseGem(get(r + 1, c)) &&
+              GemUtil.getBaseGem(g) == GemUtil.getBaseGem(get(r + 2, c))) {
             to_remove[r * NCOL + c] = true;
             to_remove[(r + 1) * NCOL + c] = true;
             to_remove[(r + 2) * NCOL + c] = true;
@@ -91,34 +96,62 @@ public class Board {
     // count and remove
     for (int r = 0; r < NROW; ++r) {
       for (int c = 0; c < NCOL; ++c) {
-        Gem g = get(r, c);
-        if (g == Gem.NOTHING) {
+        int g = get(r, c);
+        if (GemUtil.isUnknownOrNothing(g)) {
           continue;
         }
+        BaseGem gem = GemUtil.getBaseGem(g);
         if (to_remove[r * NCOL + c]) {
           List<Integer> queue = new ArrayList<Integer>();
           queue.add(r * NCOL + c);
           count++;
+          if (damages != null) {
+            damages.addCombo(1);
+            damages.get(g).combo++;
+          }
 
+          int numRemoved = 0;
           for (int i = 0; i < queue.size(); ++i) {
             int v = queue.get(i);
             int _r = v / NCOL;
             int _c = v % NCOL;
 
-            data[v] = Gem.NOTHING;
+            if (GemUtil.isUnknownOrNothing(data[v])) {
+              continue;
+            }
+            if (damages != null) {
+              int x = data[v];
+              Damages.RemovedGem removedGem = damages.get(x);
+              if (GemUtil.isEnhanced(x)) {
+                removedGem.enhanced++;
+              } else {
+                removedGem.normal++;
+              }
+            }
 
-            if (in_range(_r - 1, _c) && get(_r - 1, _c) == g && to_remove[to_index(_r - 1, _c)]) {
+            data[v] = GemUtil.NOTHING;
+            numRemoved++;
+
+            if (in_range(_r - 1, _c) && GemUtil.getBaseGem(get(_r - 1, _c)) == gem
+                && to_remove[to_index(_r - 1, _c)]) {
               queue.add(to_index(_r - 1, _c));
             }
-            if (in_range(_r + 1, _c) && get(_r + 1, _c) == g && to_remove[to_index(_r + 1, _c)]) {
+            if (in_range(_r + 1, _c) && GemUtil.getBaseGem(get(_r + 1, _c)) == gem
+                && to_remove[to_index(_r + 1, _c)]) {
               queue.add(to_index(_r + 1, _c));
             }
-            if (in_range(_r, _c - 1) && get(_r, _c - 1) == g && to_remove[to_index(_r, _c - 1)]) {
+            if (in_range(_r, _c - 1) && GemUtil.getBaseGem(get(_r, _c - 1)) == gem
+                && to_remove[to_index(_r, _c - 1)]) {
               queue.add(to_index(_r, _c - 1));
             }
-            if (in_range(_r, _c + 1) && get(_r, _c + 1) == g && to_remove[to_index(_r, _c + 1)]) {
+            if (in_range(_r, _c + 1) && GemUtil.getBaseGem(get(_r, _c + 1)) == gem
+                && to_remove[to_index(_r, _c + 1)]) {
               queue.add(to_index(_r, _c + 1));
             }
+          }
+          if (damages != null && numRemoved >= 5) {
+            Damages.RemovedGem removedGem = damages.get(g);
+            removedGem.isMultiAttack = true;
           }
         }
       }
@@ -128,13 +161,13 @@ public class Board {
     for (int c = 0; c < NCOL; ++c) {
       int i = NROW - 1;
       for (int r = NROW - 1; r >= 0; --r) {
-        if (get(r, c) != Gem.NOTHING) {
+        if (!GemUtil.isNothing(get(r, c))) {
           set(i, c, get(r, c));
           i--;
         }
       }
       for (; i >= 0; --i) {
-        set(i, c, Gem.NOTHING);
+        set(i, c, GemUtil.NOTHING);
       }
     }
 
@@ -154,30 +187,18 @@ public class Board {
     char[] chars = new char[data.length];
 
     for (int i = 0; i < data.length; ++i) {
-      chars[i] = (char) (data[i].ordinal() + '0');
+      chars[i] = GemUtil.toChar(data[i]);
     }
 
     return (new String(chars)).intern();
-  }
-
-  public enum Gem {
-    FIRE,
-    WATER,
-    GRASS,
-    LIGHT,
-    DARK,
-    HEART,
-    NOTHING;
-
-    public static int NCOLORS = 6;
   }
 
   public void print(Logger logger, Level level) {
     String msg = "\n-----------\n";
     for (int r = 0; r < NROW; ++r) {
       for (int c = 0; c < NCOL; ++c) {
-        if (data[to_index(r, c)] != Gem.NOTHING) {
-          msg += String.format("%d ", data[to_index(r, c)].ordinal());
+        if (!GemUtil.isNothing(data[to_index(r, c)])) {
+          msg += String.format("%c ", GemUtil.toChar(data[to_index(r, c)]));
         } else {
           msg += "  ";
         }
