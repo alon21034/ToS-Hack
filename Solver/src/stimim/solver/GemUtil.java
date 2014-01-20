@@ -57,7 +57,7 @@ public class GemUtil {
   }
 
   public enum BaseGem {
-    FIRE('f'), WATER('w'), GRASS('g'), LIGHT('l'), DARK('d'), HEART('h');
+    FIRE('f'), GRASS('g'), WATER('w'), LIGHT('l'), DARK('d'), HEART('h');
 
     private final char symbol;
 
