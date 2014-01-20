@@ -9,7 +9,7 @@ public class BoardTest {
   private static final int G = 2;
   private static final int W = 1;
   private static final int F = 0;
-  private static final int _ = -W;
+  private static final int _ = -1;
 
   @Test
   public void testComputeCombo() {
