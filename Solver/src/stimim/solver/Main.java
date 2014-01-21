@@ -11,11 +11,14 @@ public class Main {
     int ratioNum = 2;
     int ratioDen = 3;
     int desiredStep = 20;
+    
+    int requiredCombo = -1;
+    
     /**
      * parse args
      */
     for (String arg : args) {
-      System.out.println(arg);
+      //System.out.println(arg);
       if (arg.startsWith("--max_step=")) {
         maxStep = Integer.valueOf(arg.substring("--max_step=".length()));
       } else if (arg.startsWith("--queue_size=")) {
@@ -26,6 +29,8 @@ public class Main {
         ratioDen = Integer.valueOf(arg.substring("--ratio_den=".length()));
       } else if (arg.startsWith("--desired_step=")) {
         desiredStep = Integer.valueOf(arg.substring("--desired_step=".length()));
+      } else if (arg.startsWith("--required_combo=")) {
+    	requiredCombo = Integer.valueOf(arg.substring("--required_combo=".length()));
       }
     }
 
@@ -43,6 +48,6 @@ public class Main {
 
     Solver solver = new Solver();
 
-    solver.solve(board, maxStep, desiredStep, true, queueSize, (double) ratioNum / ratioDen);
+    solver.solve(board, maxStep, desiredStep, true, queueSize, (double) ratioNum / ratioDen, requiredCombo);
   }
 }
