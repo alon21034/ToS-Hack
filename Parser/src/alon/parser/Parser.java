@@ -4,134 +4,163 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
-import libsvm.svm;
-import libsvm.svm_model;
-import libsvm.svm_node;
-import libsvm.svm_parameter;
-import libsvm.svm_problem;
-
 public class Parser {
 
+	public static final String TRAINING_FILE_NAME = "training";
+	public static final String TESTING_FILE_NAME = "testing";
+	public static final String OUTPUT_FILE_NAME = "output";
+	public static final int FEATURE_DIM = 1200;
+	
 	public Parser() {
 		try {
-			imread("1.png");
+			train();
+			test();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
+	private void train() throws IOException {
 
-	svm_parameter _param;
-	svm_problem _prob;
-	String _model_file;
-
-	protected void loadData(boolean is_training) {
-
-		int[][] train_x = new int[30][675];
-		int[]	train_y = new int[30];
+		int[][] features = loadImages("screen_data/5.png", "screen_data/10.png");
+		int[] ys = loadAnswers("screen_data/5_result", "screen_data/10_result");
 		
-		_prob = new svm_problem();
-
-		_prob.l = 30;
-		_prob.x = new svm_node[_prob.l][];
-		for (int i = 0; i < _prob.l; i++)
-			_prob.x[i] = train_x[i]; // 儲存每個node的向量
-		_prob.y = new double[_prob.l];
-		for (int i = 0; i < _prob.l; i++)
-			_prob.y[i] = train_y[i];
-
-		System.out.println("Done!!");
+		generateSVMfile(ys, features, TRAINING_FILE_NAME);
+		
+		String[] trainArgs = {"-c","3", TRAINING_FILE_NAME};  
+		svm_train.main(trainArgs);
 	}
-
-	protected void training() {
-		loadData(true); // 這邊呼叫loadData()，使用true參數是因為在training階段
-		// 透過loadData，將資料庫的資料儲存在全域變數_prob裡面
-
-		System.out.print("Training...");
-		String _model_file = "svm_model.txt"; // 指定SVM model儲存的檔案名稱
-
-		try {
-			svm_model model = svm.svm_train(_prob, _param); // 訓練SVM model
-			System.out.println("Done!!");
-			svm.svm_save_model(_model_file, model); // 將訓練結果寫入檔案
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	
+	private void test() throws IOException {
+		
+		int[][] features = loadImages("screen_data/5.png");
+		int[] ys = loadAnswers("screen_data/5_result");
+		
+		generateSVMfile(ys, features, TESTING_FILE_NAME);
+		
+		String[] testArgs = {TESTING_FILE_NAME, TRAINING_FILE_NAME + ".model", OUTPUT_FILE_NAME};
+		svm_predict.main(testArgs);
 	}
-
-	protected void testing() {
-		loadData(false); // 讀取剩下的300分資料，轉換成SVM問題(存在_prob裡)
-
-		svm_model model;
-		int correct = 0, total = 0;
-		try {
-			model = svm.svm_load_model(_model_file); // 載入model
-
-			for (int i = 0; i < _prob.l; i++) { // 對problem 裡的每個SVM node
-				double v;
-				svm_node[] x = _prob.x[i]; // 取出svm node
-				v = svm.svm_predict(model, x); // 把node餵給預測器
-				// 這時預測器會依照model與node內的向量資訊，產生預測的數值(-1或1)
-				total++;
-				if (v == _prob.y[i])
-					correct++; // 如果跟正確答案一樣，則正確數加一
-			}
-
-			double accuracy = (double) correct / total * 100;
-			System.out.println("Accuracy = " + accuracy + "% (" + correct + "/"
-					+ total + ")");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void imread(String filename) throws IOException {
-		BufferedImage img = ImageIO.read(new File(filename));
-
-		System.out.print(img.getWidth() + "  " + img.getHeight());
-		
-		int w = img.getWidth();
-		int h = img.getHeight();
-
-		int gem_width = (int) (0.0938f * h);
-		int start_h = (int) (0.453f * h);
-
-		
-		BufferedImage pic1 = img.getSubimage(0, start_h, w, 5*gem_width);
-		
-		for (int i = 0 ; i < 5 ; i++) {
-			for (int j = 0 ; j < 6 ; j++) {
-				getFeatures(gem_width, pic1, i, j);
-			}
-		}
-	}
-
-	private int[] getFeatures(int gem_width, BufferedImage pic1, int i, int j) throws IOException {
-		
-		int[] ret = new int[15*15*3];
-		
-		BufferedImage pic = pic1.getSubimage(j*gem_width, i*gem_width, gem_width, gem_width);
-		pic = pic.getSubimage(gem_width/4, gem_width/4, gem_width/2, gem_width/2);
-		pic = getScaledImage(pic, 15, 15);
-		
+	
+	private void generateSVMfile(int[] y, int[][] features, String filename) throws FileNotFoundException {
+		PrintWriter out = new PrintWriter(filename);
 		
 		int index = 0;
-		for (int x = 0 ; x < 15 ; x++) {
-			for (int y = 0 ; y < 15 ; y++) {
-				int color = pic.getRGB(x, y);
-				ret[index] = getR(color);
-				ret[index+1] = getG(color);
-				ret[index+2] = getB(color);
-				index+=3;
+		for (int[] xs : features) {
+			out.print(y[index++]);
+			out.print(" ");
+			out.println(arrayToSparse(xs));
+		}
+		
+		out.close();
+	}
+	
+	private int[] loadAnswers(String... strs) throws IOException {
+		int num = strs.length;
+		int[][] ret = new int[num][30];
+		
+		int index = 0;
+		for (String str : strs) {
+			System.out.println("reading: " + str);
+			Scanner in = new Scanner(new FileReader(str));
+			for (int i = 0 ; i < 30 ; ++i) {
+				ret[index][i] = in.nextInt();
 			}
+			index++;
+		}
+		return flatten(ret);
+	}
+	
+	private int[][] loadImages(String... strs) throws IOException {
+		int[][] ret = new int[strs.length * 30][FEATURE_DIM];
+		
+		int index = 0;
+		for (int count = 0 ; count < strs.length ; ++count) {
+			System.out.println("reading: " + strs[count]);
+			BufferedImage img = ImageIO.read(new File(strs[count]));
+			// clip origin image
+			
+			int WIDTH = img.getWidth();
+			int HEIGHT = img.getHeight();
+			System.out.println("width:" + WIDTH + "   height:" + HEIGHT);
+			
+			int p = (int)WIDTH / 6; // width one slot.
+			// p(0,0) to p(5, 4)
+			// p(0,0) = (p, 1280 - 80 -9*p)
+			// p(a, b) = (p+2p, 1200 - (9-2*b)*p)
+
+			for (int i = 0 ; i < 6 ; i++) {
+				for (int j = 0 ; j < 5 ; j++) {
+					int x =  (WIDTH*i)/6;
+					int y = (int) (HEIGHT - HEIGHT*0.078125 - (5-j) * WIDTH/6);
+
+					BufferedImage subImage = img.getSubimage(x+p/4, y+p/4, p/2, p/2);
+					ImageIO.write(subImage, "png", new File("tmp.png"));
+					int[] features = retrieveFeature(subImage);
+					for (int k = 0 ; k < FEATURE_DIM ; ++k) {
+						ret[index][k] = features[k];
+					}
+					index++;
+				}
+			}
+			
+		}
+		
+		return ret;
+	}
+	
+	private int[] retrieveFeature(BufferedImage image) {
+		int[] ret = new int[FEATURE_DIM];
+		image = getScaledImage(image, 20, 20);
+		int[] colors = image.getRGB(0, 0, 20, 20, null, 0, 20);
+		for (int i = 0 ; i < colors.length ; ++i) {
+			ret[3 * i] = getR(colors[i]);
+			ret[3 * i + 1] = getG(colors[i]);
+			ret[3 * i + 2] = getB(colors[i]);
 		}
 		return ret;
 	}
+	
+	private String arrayToSparse(int[] arr) {
+		StringBuilder sb = new StringBuilder();
+		
+		for (int i = 0 ; i < arr.length ; ++i) {
+			if (arr[i] != 0) {
+				sb.append(i);
+				sb.append(":");
+				sb.append(arr[i]);
+				sb.append(" ");
+			}
+		}
+		
+		return sb.toString();
+	}
+	
+	public static int[] flatten(int[][] data) {
 
-	public static BufferedImage getScaledImage(BufferedImage image, int width, int height) throws IOException {
+		int[] ret = new int[data.length * data[0].length];
+		int index = 0;
+	    for(int i = 0; i < data.length; i++) {
+	    	
+	        for(int j = 0; j < data[i].length; j++){
+	        	ret[index++] = data[i][j];
+	        }
+	    }
+	    
+	    return ret;
+	}
+	
+	public static BufferedImage getScaledImage(BufferedImage image, int width, int height) {
 	    int imageWidth  = image.getWidth();
 	    int imageHeight = image.getHeight();
 

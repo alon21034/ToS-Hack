@@ -1,4 +1,4 @@
-package alon.parser.utils;
+package alon.parser;
 
 import libsvm.*;
 import java.io.*;
