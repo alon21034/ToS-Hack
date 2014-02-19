@@ -8,6 +8,8 @@ Tos-Hack/Main.jar
 Solver/bin/
 SolverTest/bin/
 Parser/bin/
+Parser/screen_data
+img/
 data/
 *.project
 *.classpath
