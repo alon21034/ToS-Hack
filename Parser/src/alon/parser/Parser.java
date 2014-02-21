@@ -17,7 +17,12 @@ public class Parser {
 	public static final String TRAINING_FILE_NAME = "training";
 	public static final String TESTING_FILE_NAME = "testing";
 	public static final String OUTPUT_FILE_NAME = "output";
-	public static final int FEATURE_DIM = 1200;
+	
+	public static final int FEATURE_DIM = 27;
+	public static final int GEM_NUMBER = 30;
+	private static final int SCALED_SIZE = 40;
+
+	private static final int[] TRAINING_FILES = {5, 10, 11};
 	
 	public Parser() {
 		try {
@@ -32,12 +37,12 @@ public class Parser {
 	
 	private void train() throws IOException {
 
-		int[][] features = loadImages("screen_data/5.png", "screen_data/10.png");
-		int[] ys = loadAnswers("screen_data/5_result", "screen_data/10_result");
+		int[][] features = loadImages(getInputStringArray(TRAINING_FILES, "screen_data/", ".png"));
+		int[] ys = loadAnswers(getInputStringArray(TRAINING_FILES, "screen_data/", "_result"));
 		
 		generateSVMfile(ys, features, TRAINING_FILE_NAME);
 		
-		String[] trainArgs = {"-c","3", TRAINING_FILE_NAME};  
+		String[] trainArgs = {"-c","2", TRAINING_FILE_NAME};  
 		svm_train.main(trainArgs);
 	}
 	
@@ -65,15 +70,33 @@ public class Parser {
 		out.close();
 	}
 	
+	private int[] loadColorAnswer() {
+		int[] ret = new int[GEM_NUMBER];
+		
+		return ret;
+	}
+	
+	private int[] loadEnhanceAnswer() {
+		int[] ret = new int[GEM_NUMBER];
+		
+		return ret;
+	}
+	
+	private int[] loadWitherAnswer() {
+		int[] ret = new int[GEM_NUMBER];
+				
+		return ret;
+	}
+	
 	private int[] loadAnswers(String... strs) throws IOException {
 		int num = strs.length;
-		int[][] ret = new int[num][30];
+		int[][] ret = new int[num][GEM_NUMBER];
 		
 		int index = 0;
 		for (String str : strs) {
 			System.out.println("reading: " + str);
 			Scanner in = new Scanner(new FileReader(str));
-			for (int i = 0 ; i < 30 ; ++i) {
+			for (int i = 0 ; i < GEM_NUMBER ; ++i) {
 				ret[index][i] = in.nextInt();
 			}
 			index++;
@@ -82,7 +105,7 @@ public class Parser {
 	}
 	
 	private int[][] loadImages(String... strs) throws IOException {
-		int[][] ret = new int[strs.length * 30][FEATURE_DIM];
+		int[][] ret = new int[strs.length * GEM_NUMBER][FEATURE_DIM];
 		
 		int index = 0;
 		for (int count = 0 ; count < strs.length ; ++count) {
@@ -121,13 +144,39 @@ public class Parser {
 	
 	private int[] retrieveFeature(BufferedImage image) {
 		int[] ret = new int[FEATURE_DIM];
-		image = getScaledImage(image, 20, 20);
-		int[] colors = image.getRGB(0, 0, 20, 20, null, 0, 20);
+		int[] rs = new int[SCALED_SIZE*SCALED_SIZE];
+		int[] gs = new int[SCALED_SIZE*SCALED_SIZE];
+		int[] bs = new int[SCALED_SIZE*SCALED_SIZE];
+		
+		image = getScaledImage(image, SCALED_SIZE, SCALED_SIZE);
+		int[] colors = image.getRGB(0, 0, SCALED_SIZE, SCALED_SIZE, null, 0, SCALED_SIZE);
 		for (int i = 0 ; i < colors.length ; ++i) {
-			ret[3 * i] = getR(colors[i]);
-			ret[3 * i + 1] = getG(colors[i]);
-			ret[3 * i + 2] = getB(colors[i]);
+			rs[i] = getR(colors[i]);
+			gs[i] = getG(colors[i]);
+			bs[i] = getB(colors[i]);
 		}
+		
+		int count = 0;
+		for (int i = 10 ; i < 40 ; i+=10) {
+			for (int j = 10 ; j < 40 ; j+=10) {
+				
+				int r = 0, g = 0, b = 0;
+				
+				for (int m = -3 ; m < 4 ; m++) {
+					for (int n = -3 ; n < 4 ; n++) {
+						int index = (i+m)*SCALED_SIZE + (j+n); 
+						r += rs[index];
+						g += gs[index];
+						b += bs[index];
+					}
+				}
+				
+				ret[count++] = r;
+				ret[count++] = g;
+				ret[count++] = b;
+			}
+		}
+		
 		return ret;
 	}
 	
@@ -174,15 +223,25 @@ public class Parser {
 	        new BufferedImage(width, height, image.getType()));
 	}
 	
-	public int getR(int color) {
-		return (color&0x00fc0000) >> 18;
+	public static int getR(int color) {
+		return (color&0x00fc0000) >> 16;
 	}
 
-	public int getG(int color) {
-		return (color&0x0000fc00) >> 10;
+	public static int getG(int color) {
+		return (color&0x0000fc00) >> 8;
 	}
 
-	public int getB(int color) {
-		return (color&0x000000fc) >> 2;
+	public static int getB(int color) {
+		return (color&0x000000fc) >> 0;
+	}
+	
+	private String[] getInputStringArray(int[] arr, String preStr, String postStr) {
+		String[] ret = new String[arr.length];
+		
+		int count = 0;
+		for (int n : arr) {
+			ret[count++] = preStr + n + postStr; 
+		}
+		return ret;
 	}
 }
