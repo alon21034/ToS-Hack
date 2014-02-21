@@ -17,12 +17,19 @@ public class Parser {
 	public static final String TRAINING_FILE_NAME = "training";
 	public static final String TESTING_FILE_NAME = "testing";
 	public static final String OUTPUT_FILE_NAME = "output";
+	public static final String FEATURE_FILE_NAME = "features";
 	
 	public static final int FEATURE_DIM = 27;
 	public static final int GEM_NUMBER = 30;
 	private static final int SCALED_SIZE = 40;
 
-	private static final int[] TRAINING_FILES = {5, 10, 11};
+	private static final int FLAG_COLOR = 0;
+	private static final int FLAG_ENHANCE = 1;
+	private static final int FLAG_WITHER = 2;
+	private static final int FLAG_PUZZLE = 3;
+	
+	private static final int[] TRAINING_FILES = {1, 2, 3, 16, 17, 18, 19, 21, 22, 25};
+	private static final int[] TESTING_FILES = { 5,10,11,12,20,24};
 	
 	public Parser() {
 		try {
@@ -37,31 +44,73 @@ public class Parser {
 	
 	private void train() throws IOException {
 
-		int[][] features = loadImages(getInputStringArray(TRAINING_FILES, "screen_data/", ".png"));
-		int[] ys = loadAnswers(getInputStringArray(TRAINING_FILES, "screen_data/", "_result"));
+		float[][] features = loadImages(getInputStringArray(TRAINING_FILES, "screen_data/", ".png"));
+		int[] ys0 = loadColorAnswer(getInputStringArray(TRAINING_FILES, "screen_data/", "_result"));
+		int[] ys1 = loadEnhanceAnswer(getInputStringArray(TRAINING_FILES, "screen_data/", "_result"));
+		int[] ys2 = loadWitherAnswer(getInputStringArray(TRAINING_FILES, "screen_data/", "_result"));
 		
-		generateSVMfile(ys, features, TRAINING_FILE_NAME);
+		int[] y = new int[ys0.length];
+		for (int i = 0 ; i < y.length ; i++)
+			y[i] = ys0[i] + ys1[i]*7;
 		
-		String[] trainArgs = {"-c","2", TRAINING_FILE_NAME};  
-		svm_train.main(trainArgs);
+		generateSVMfile(ys0, features, TRAINING_FILE_NAME + FLAG_COLOR);
+		generateSVMfile(ys1, features, TRAINING_FILE_NAME + FLAG_ENHANCE);
+		generateSVMfile(ys2, features, TRAINING_FILE_NAME + FLAG_WITHER);
+		
+		String[] trainArgs0 = {"-c","15","-t","2", "-g","0.5", "-q", TRAINING_FILE_NAME + FLAG_COLOR};  
+		svm_train.main(trainArgs0);
+		String[] trainArgs1 = {"-c","15","-t","0", "-g","0.5", "-q", TRAINING_FILE_NAME + FLAG_ENHANCE};  
+		svm_train.main(trainArgs1);
+		String[] trainArgs2 = {"-c","10","-t","0", "-g","0.5", "-q", TRAINING_FILE_NAME + FLAG_WITHER};  
+		svm_train.main(trainArgs2);
 	}
 	
 	private void test() throws IOException {
 		
-		int[][] features = loadImages("screen_data/5.png");
-		int[] ys = loadAnswers("screen_data/5_result");
+		float[][] features = loadImages(getInputStringArray(TESTING_FILES, "screen_data/", ".png"));
+		int[] ys0 = loadColorAnswer(getInputStringArray(TESTING_FILES, "screen_data/", "_result"));
+		int[] ys1 = loadEnhanceAnswer(getInputStringArray(TESTING_FILES, "screen_data/", "_result"));
+		int[] ys2 = loadWitherAnswer(getInputStringArray(TESTING_FILES, "screen_data/", "_result"));
 		
-		generateSVMfile(ys, features, TESTING_FILE_NAME);
+		int[] y = new int[ys0.length];
+		for (int i = 0 ; i < y.length ; i++)
+			y[i] = ys0[i] + ys1[i]*7;
 		
-		String[] testArgs = {TESTING_FILE_NAME, TRAINING_FILE_NAME + ".model", OUTPUT_FILE_NAME};
-		svm_predict.main(testArgs);
+		generateSVMfile(ys0, features, TESTING_FILE_NAME + FLAG_COLOR);
+		generateSVMfile(ys1, features, TESTING_FILE_NAME + FLAG_ENHANCE);
+		generateSVMfile(ys2, features, TESTING_FILE_NAME + FLAG_WITHER);
+		
+		String[] testArgs0 = {TESTING_FILE_NAME + FLAG_COLOR, TRAINING_FILE_NAME + FLAG_COLOR + ".model", OUTPUT_FILE_NAME + FLAG_COLOR};
+		svm_predict.main(testArgs0);
+		String[] testArgs1 = {TESTING_FILE_NAME + FLAG_ENHANCE, TRAINING_FILE_NAME + FLAG_ENHANCE + ".model", OUTPUT_FILE_NAME + FLAG_ENHANCE};
+		svm_predict.main(testArgs1);
+		String[] testArgs2 = {TESTING_FILE_NAME + FLAG_WITHER, TRAINING_FILE_NAME + FLAG_WITHER + ".model", OUTPUT_FILE_NAME + FLAG_WITHER};
+		svm_predict.main(testArgs2);
+	}
+
+	private void test(String imagePath) throws IOException {
+		float[][] features = loadImages(imagePath);
+		int[] ys0 = loadColorAnswer(imagePath);
+		int[] ys1 = loadEnhanceAnswer(imagePath);
+		int[] ys2 = loadWitherAnswer(imagePath);
+		
+		generateSVMfile(ys0, features, FEATURE_FILE_NAME + FLAG_COLOR);
+		generateSVMfile(ys1, features, FEATURE_FILE_NAME + FLAG_ENHANCE);
+		generateSVMfile(ys2, features, FEATURE_FILE_NAME + FLAG_WITHER);
+		
+		String[] testArgs0 = {FEATURE_FILE_NAME + FLAG_COLOR, TRAINING_FILE_NAME + FLAG_COLOR + ".model", OUTPUT_FILE_NAME + FLAG_COLOR};
+		svm_predict.main(testArgs0);
+		String[] testArgs1 = {FEATURE_FILE_NAME + FLAG_ENHANCE, TRAINING_FILE_NAME + FLAG_ENHANCE + ".model", OUTPUT_FILE_NAME + FLAG_ENHANCE};
+		svm_predict.main(testArgs1);
+		String[] testArgs2 = {FEATURE_FILE_NAME + FLAG_WITHER, TRAINING_FILE_NAME + FLAG_WITHER + ".model", OUTPUT_FILE_NAME + FLAG_WITHER};
+		svm_predict.main(testArgs2);
 	}
 	
-	private void generateSVMfile(int[] y, int[][] features, String filename) throws FileNotFoundException {
+	private void generateSVMfile(int[] y, float[][] features, String filename) throws FileNotFoundException {
 		PrintWriter out = new PrintWriter(filename);
 		
 		int index = 0;
-		for (int[] xs : features) {
+		for (float[] xs : features) {
 			out.print(y[index++]);
 			out.print(" ");
 			out.println(arrayToSparse(xs));
@@ -70,25 +119,19 @@ public class Parser {
 		out.close();
 	}
 	
-	private int[] loadColorAnswer() {
-		int[] ret = new int[GEM_NUMBER];
-		
-		return ret;
+	private int[] loadColorAnswer(String... strs) throws IOException {
+		return loadAnswers(FLAG_COLOR, strs);
 	}
 	
-	private int[] loadEnhanceAnswer() {
-		int[] ret = new int[GEM_NUMBER];
-		
-		return ret;
+	private int[] loadEnhanceAnswer(String... strs) throws IOException {
+		return loadAnswers(FLAG_ENHANCE, strs);
 	}
 	
-	private int[] loadWitherAnswer() {
-		int[] ret = new int[GEM_NUMBER];
-				
-		return ret;
+	private int[] loadWitherAnswer(String... strs) throws IOException {
+		return loadAnswers(FLAG_WITHER, strs);
 	}
 	
-	private int[] loadAnswers(String... strs) throws IOException {
+	private int[] loadAnswers(int flag, String... strs) throws IOException {
 		int num = strs.length;
 		int[][] ret = new int[num][GEM_NUMBER];
 		
@@ -96,6 +139,8 @@ public class Parser {
 		for (String str : strs) {
 			System.out.println("reading: " + str);
 			Scanner in = new Scanner(new FileReader(str));
+			for (int i = 0 ; i < GEM_NUMBER * flag ; ++i) {in.nextInt(); }
+			
 			for (int i = 0 ; i < GEM_NUMBER ; ++i) {
 				ret[index][i] = in.nextInt();
 			}
@@ -104,8 +149,8 @@ public class Parser {
 		return flatten(ret);
 	}
 	
-	private int[][] loadImages(String... strs) throws IOException {
-		int[][] ret = new int[strs.length * GEM_NUMBER][FEATURE_DIM];
+	private float[][] loadImages(String... strs) throws IOException {
+		float[][] ret = new float[strs.length * GEM_NUMBER][FEATURE_DIM];
 		
 		int index = 0;
 		for (int count = 0 ; count < strs.length ; ++count) {
@@ -122,14 +167,14 @@ public class Parser {
 			// p(0,0) = (p, 1280 - 80 -9*p)
 			// p(a, b) = (p+2p, 1200 - (9-2*b)*p)
 
-			for (int i = 0 ; i < 6 ; i++) {
-				for (int j = 0 ; j < 5 ; j++) {
-					int x =  (WIDTH*i)/6;
-					int y = (int) (HEIGHT - HEIGHT*0.078125 - (5-j) * WIDTH/6);
+			for (int i = 0 ; i < 5 ; i++) {
+				for (int j = 0 ; j < 6 ; j++) {
+					int x =  (WIDTH*j)/6;
+					int y = (int) (HEIGHT - HEIGHT*0.078125 - (5-i) * WIDTH/6);
 
 					BufferedImage subImage = img.getSubimage(x+p/4, y+p/4, p/2, p/2);
 					ImageIO.write(subImage, "png", new File("tmp.png"));
-					int[] features = retrieveFeature(subImage);
+					float[] features = retrieveFeature(subImage);
 					for (int k = 0 ; k < FEATURE_DIM ; ++k) {
 						ret[index][k] = features[k];
 					}
@@ -142,8 +187,8 @@ public class Parser {
 		return ret;
 	}
 	
-	private int[] retrieveFeature(BufferedImage image) {
-		int[] ret = new int[FEATURE_DIM];
+	private float[] retrieveFeature(BufferedImage image) {
+		float[] ret = new float[FEATURE_DIM];
 		int[] rs = new int[SCALED_SIZE*SCALED_SIZE];
 		int[] gs = new int[SCALED_SIZE*SCALED_SIZE];
 		int[] bs = new int[SCALED_SIZE*SCALED_SIZE];
@@ -164,23 +209,23 @@ public class Parser {
 				
 				for (int m = -3 ; m < 4 ; m++) {
 					for (int n = -3 ; n < 4 ; n++) {
-						int index = (i+m)*SCALED_SIZE + (j+n); 
+						int index = (i+m) + (j+n)*SCALED_SIZE; 
 						r += rs[index];
 						g += gs[index];
 						b += bs[index];
 					}
 				}
 				
-				ret[count++] = r;
-				ret[count++] = g;
-				ret[count++] = b;
+				ret[count++] = (float)r/49/256;
+				ret[count++] = (float)g/49/256;
+				ret[count++] = (float)b/49/256;
 			}
 		}
 		
 		return ret;
 	}
 	
-	private String arrayToSparse(int[] arr) {
+	private String arrayToSparse(float[] arr) {
 		StringBuilder sb = new StringBuilder();
 		
 		for (int i = 0 ; i < arr.length ; ++i) {
@@ -224,15 +269,15 @@ public class Parser {
 	}
 	
 	public static int getR(int color) {
-		return (color&0x00fc0000) >> 16;
+		return (color&0x00ff0000) >> 16;
 	}
 
 	public static int getG(int color) {
-		return (color&0x0000fc00) >> 8;
+		return (color&0x0000ff00) >> 8;
 	}
 
 	public static int getB(int color) {
-		return (color&0x000000fc) >> 0;
+		return (color&0x000000ff) >> 0;
 	}
 	
 	private String[] getInputStringArray(int[] arr, String preStr, String postStr) {
