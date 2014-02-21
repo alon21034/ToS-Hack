@@ -70,7 +70,7 @@ public class GemUtil {
 			char retval = symbol;
 
 			if (isWeathered) {
-				retval = (char) ((retval - 'a') + 'ⓐ');
+				retval = (char) ((retval - 'a') + '?');
 			}
 
 			if (isEnhanced) {
