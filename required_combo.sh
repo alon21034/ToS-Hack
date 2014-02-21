@@ -7,7 +7,7 @@ adb shell getevent -lp /dev/input/event$eventnum > tmp
 x=`grep ABS_MT_POSITION_X tmp | grep 'max [0-9]\+' -o | grep '[0-9]\+' -o`
 y=`grep ABS_MT_POSITION_Y tmp | grep 'max [0-9]\+' -o | grep '[0-9]\+' -o`
 
-for (( i = 0; i < $1; i++ )); do
+while [[ "$yn" != "y" ]]; do
 	echo "start"
 	
 	adb shell screencap -p /sdcard/screen.png
@@ -15,8 +15,8 @@ for (( i = 0; i < $1; i++ )); do
 
 	java -cp ./Tos-Hack/bin Main screen.png
 
-    #read -p "required_combo = ?" r_cb
-	java -Xmx2g -cp ./Solver/bin stimim.solver.Main < board > step
+    read -p "required_combo = ?" r_cb
+	java -Xmx2g -cp ./Solver/bin stimim.solver.Main --required_combo=$r_cb < board > step
 
 	echo "$x $y" | ./data/generateTrace $eventnum
 
@@ -25,10 +25,6 @@ for (( i = 0; i < $1; i++ )); do
 
     echo "$i done"
 
-    for (( j = 0 ; j < 17 ; j++ )); do
-    	sleep 1
-    	echo 'wait'
-    done
-    #read -p "Please input yes/YES to stop this program: " yn
+    read -p "Please input yes/YES to stop this program: " yn
 done
 

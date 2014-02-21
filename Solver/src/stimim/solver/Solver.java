@@ -15,11 +15,17 @@ public class Solver {
   private static final Logger logger = Logger.getLogger(Solver.class.getName());
   private static final Level level = Level.INFO;
 
+
   public int solve(Board initBoard, int maxMove, int desiredMove, boolean canMoveDiagonal,
-      int maxCreated, double pruneRatio) {
+	      int maxCreated, double pruneRatio) {
+	  return solve(initBoard, maxMove, desiredMove, canMoveDiagonal, maxCreated, pruneRatio, -1);
+  }
+
+  public int solve(Board initBoard, int maxMove, int desiredMove, boolean canMoveDiagonal,
+      int maxCreated, double pruneRatio, int comboNum) {
+    Level level = Level.INFO;
     logger.setLevel(Level.ALL);
-    int comboUpperBound = initBoard.computeComboUpperBound();
-    Step.MAX_COMBO = comboUpperBound;
+    int comboUpperBound = (comboNum > 0)? comboNum : initBoard.computeComboUpperBound();
 
     final Comparator<Step> comparator =
         new Comparator<Step>() {
@@ -121,7 +127,7 @@ public class Solver {
     }
 
     List<Position> steps = genSteps(best);
-    System.out.println(steps.size());
+    //System.out.println(steps.size());
     for (Position p : steps) {
       System.out.println(String.format("%d %d", p.r, p.c));
     }
