@@ -13,11 +13,17 @@ import java.util.logging.Logger;
 public class Solver {
   private static final Logger logger = Logger.getLogger(Solver.class.getName());
 
+  
   public int solve(Board initBoard, int maxMove, int desiredMove, boolean canMoveDiagonal,
-      int maxCreated, double pruneRatio) {
+	      int maxCreated, double pruneRatio) {
+	  return solve(initBoard, maxMove, desiredMove, canMoveDiagonal, maxCreated, pruneRatio, -1);
+  }
+  
+  public int solve(Board initBoard, int maxMove, int desiredMove, boolean canMoveDiagonal,
+      int maxCreated, double pruneRatio, int comboNum) {
     Level level = Level.INFO;
     logger.setLevel(Level.ALL);
-    int comboUpperBound = initBoard.computeComboUpperBound();
+    int comboUpperBound = (comboNum > 0)? comboNum : initBoard.computeComboUpperBound();
 
     final Comparator<Step> comparator =
         new Comparator<Step>() {
@@ -49,7 +55,7 @@ public class Solver {
         logger.log(level, String.format("Find %d combos in %d moves\n", s.combo, s.moves));
         best = s;
 
-        if (best.combo == comboUpperBound && best.moves <= desiredMove) {
+        if (best.combo >= comboUpperBound && best.moves <= desiredMove) {
           break;
         }
       }
@@ -104,7 +110,7 @@ public class Solver {
     }
 
     List<Position> steps = genSteps(best);
-    System.out.println(steps.size());
+    //System.out.println(steps.size());
     for (Position p : steps) {
       System.out.println(String.format("%d %d", p.r, p.c));
     }
