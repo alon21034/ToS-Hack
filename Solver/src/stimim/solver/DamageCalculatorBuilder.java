@@ -5,7 +5,7 @@ import stimim.solver.Damages.RemovedGem;
 
 public class DamageCalculatorBuilder {
   public static DamageCalculator getDefaultDamageCalculator() {
-    return new DamageCalculatorImpl(0.5, new double[] {1, 1, 1, 1, 1, 1}, 1, 1, 1);
+    return new DamageCalculatorImpl(0.5, new double[] {1, 1, 1, 1, 1, 1}, 1, 1.5, 1);
   }
 
   public static DamageCalculator getSingleAtkDamageCalculator() {
@@ -13,7 +13,11 @@ public class DamageCalculatorBuilder {
   }
 
   public static DamageCalculator getAllFireDamageCalculator() {
-    return new DamageCalculatorImpl(0.5, new double[] {3, 0.2, 0.2, 0.2, 0.2, 1}, 1, 1, 1);
+    return new DamageCalculatorImpl(0.5, new double[] {3, 0.2, 0.2, 0.2, 0.2, 1}, 1, 1.5, 1);
+  }
+
+  public static DamageCalculator getAllDarkDamageCalculator() {
+    return new DamageCalculatorImpl(0.5, new double[] {0.2, 0.2, 0.2, 0.2, 3, 1}, 1, 1.5, 1);
   }
 
   public static class DamageCalculatorImpl implements DamageCalculator {

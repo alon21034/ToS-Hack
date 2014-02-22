@@ -8,23 +8,24 @@ x=`grep ABS_MT_POSITION_X tmp | grep 'max [0-9]\+' -o | grep '[0-9]\+' -o`
 y=`grep ABS_MT_POSITION_Y tmp | grep 'max [0-9]\+' -o | grep '[0-9]\+' -o`
 
 while [[ "$yn" != "y" ]]; do
-	echo "start"
-	
-	adb shell screencap -p /sdcard/screen.png
-    adb pull /sdcard/screen.png
+  echo "start"
 
-	java -cp ./Tos-Hack/bin Main screen.png
+  adb shell screencap -p /sdcard/screen.png
+  adb pull /sdcard/screen.png
 
-    read -p "required_combo = ?" r_cb
-	java -Xmx2g -cp ./Solver/bin stimim.solver.Main --required_combo=$r_cb < board > step
+  java -cp ./Tos-Hack/bin Main screen.png
 
-	echo "$x $y" | ./data/generateTrace $eventnum
+  read -t 5 -p "required_combo = ?" r_cb
+  r_cb=${r_cb:--1}
+  java -Xmx2g -cp ./Solver/bin stimim.solver.Main --required_combo=$r_cb < board > step
 
-    adb push ./test.sh  /sdcard/test.sh
-    adb shell sh /sdcard/test.sh
+  echo "$x $y" | ./data/generateTrace $eventnum
 
-    echo "$i done"
+  adb push test.sh /sdcard/test.sh
+  adb shell sh /sdcard/test.sh
 
-    read -p "Please input yes/YES to stop this program: " yn
+  echo "$i done"
+
+  read -p "Please input yes/YES to stop this program: " yn
 done
 
