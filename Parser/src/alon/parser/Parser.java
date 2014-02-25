@@ -243,7 +243,6 @@ public class Parser {
 
 					BufferedImage subImage = img.getSubimage(x + p / 4, y + p
 							/ 4, p / 2, p / 2);
-					ImageIO.write(subImage, "png", new File("tmp.png"));
 					float[] features = retrieveFeature(subImage);
 					for (int k = 0; k < FEATURE_DIM; ++k) {
 						ret[index][k] = features[k];

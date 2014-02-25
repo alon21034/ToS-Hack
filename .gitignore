@@ -13,3 +13,14 @@ img/
 data/
 *.project
 *.classpath
+.DS_Store
+
+#files
+*~
+handlerList
+*.png
+strp
+test.sh
+tmp
+step
+
