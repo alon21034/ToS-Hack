@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
@@ -39,17 +40,17 @@ public class Parser {
 	public void train() {
 
 		System.out.println("start training...");
-		
+
 		float[][] features;
 		try {
 			features = loadImages(getInputStringArray(TRAINING_FILES,
-					"screen_data/", ".png"));
+					"Parser/screen_data/", ".png"));
 			int[] ys0 = loadColorAnswer(getInputStringArray(TRAINING_FILES,
-					"screen_data/", "_result"));
+					"Parser/screen_data/", "_result"));
 			int[] ys1 = loadEnhanceAnswer(getInputStringArray(TRAINING_FILES,
-					"screen_data/", "_result"));
+					"Parser/screen_data/", "_result"));
 			int[] ys2 = loadWitherAnswer(getInputStringArray(TRAINING_FILES,
-					"screen_data/", "_result"));
+					"Parser/screen_data/", "_result"));
 
 			int[] y = new int[ys0.length];
 			for (int i = 0; i < y.length; i++)
@@ -78,13 +79,13 @@ public class Parser {
 		float[][] features;
 		try {
 			features = loadImages(getInputStringArray(TESTING_FILES,
-					"screen_data/", ".png"));
+					"Parser/screen_data/", ".png"));
 			int[] ys0 = loadColorAnswer(getInputStringArray(TESTING_FILES,
-					"screen_data/", "_result"));
+					"Parser/screen_data/", "_result"));
 			int[] ys1 = loadEnhanceAnswer(getInputStringArray(TESTING_FILES,
-					"screen_data/", "_result"));
+					"Parser/screen_data/", "_result"));
 			int[] ys2 = loadWitherAnswer(getInputStringArray(TESTING_FILES,
-					"screen_data/", "_result"));
+					"Parser/screen_data/", "_result"));
 
 			int[] y = new int[ys0.length];
 			for (int i = 0; i < y.length; i++)
@@ -115,29 +116,59 @@ public class Parser {
 		float[][] features;
 		try {
 			features = loadImages(imagePath);
-			int[] ys0 = loadColorAnswer(imagePath);
-			int[] ys1 = loadEnhanceAnswer(imagePath);
-			int[] ys2 = loadWitherAnswer(imagePath);
+			int[] ys0 = new int[GEM_NUMBER];
+			int[] ys1 = new int[GEM_NUMBER];
+			int[] ys2 = new int[GEM_NUMBER];
 
 			generateSVMfile(ys0, features, FEATURE_FILE_NAME + FLAG_COLOR);
 			generateSVMfile(ys1, features, FEATURE_FILE_NAME + FLAG_ENHANCE);
 			generateSVMfile(ys2, features, FEATURE_FILE_NAME + FLAG_WITHER);
 
-			String[] testArgs0 = { FEATURE_FILE_NAME + FLAG_COLOR,
+			String[] testArgs0 = { "-q", FEATURE_FILE_NAME + FLAG_COLOR,
 					TRAINING_FILE_NAME + FLAG_COLOR + ".model",
 					OUTPUT_FILE_NAME + FLAG_COLOR };
 			svm_predict.main(testArgs0);
-			String[] testArgs1 = { FEATURE_FILE_NAME + FLAG_ENHANCE,
+			String[] testArgs1 = { "-q", FEATURE_FILE_NAME + FLAG_ENHANCE,
 					TRAINING_FILE_NAME + FLAG_ENHANCE + ".model",
 					OUTPUT_FILE_NAME + FLAG_ENHANCE };
 			svm_predict.main(testArgs1);
-			String[] testArgs2 = { FEATURE_FILE_NAME + FLAG_WITHER,
+			String[] testArgs2 = { "-q", FEATURE_FILE_NAME + FLAG_WITHER,
 					TRAINING_FILE_NAME + FLAG_WITHER + ".model",
 					OUTPUT_FILE_NAME + FLAG_WITHER };
 			svm_predict.main(testArgs2);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void generateOutputFile(String str) {
+		int[][] result = new int[3][GEM_NUMBER];
+
+		try {
+			Scanner scanner = new Scanner(new File(OUTPUT_FILE_NAME
+					+ FLAG_COLOR));
+			for (int i = 0; i < GEM_NUMBER; ++i)
+				result[FLAG_COLOR][i] = (int) scanner.nextFloat();
+			scanner = new Scanner(new File(OUTPUT_FILE_NAME + FLAG_ENHANCE));
+			for (int i = 0; i < GEM_NUMBER; ++i)
+				result[FLAG_ENHANCE][i] = (int) scanner.nextFloat();
+			scanner = new Scanner(new File(OUTPUT_FILE_NAME + FLAG_WITHER));
+			for (int i = 0; i < GEM_NUMBER; ++i)
+				result[FLAG_WITHER][i] = (int) scanner.nextFloat();
+
+			PrintWriter out = new PrintWriter(str);
+			for (int i = 0; i < GEM_NUMBER; ++i) {
+				out.print(result[FLAG_COLOR][i] | result[FLAG_WITHER][i] << 4
+						| result[FLAG_ENHANCE][i] << 8);
+				out.print(" ");
+				if (i % 6 == 5)
+					out.println();
+			}
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	private void generateSVMfile(int[] y, float[][] features, String filename)
@@ -197,7 +228,7 @@ public class Parser {
 
 			int WIDTH = img.getWidth();
 			int HEIGHT = img.getHeight();
-//			System.out.println("width:" + WIDTH + "   height:" + HEIGHT);
+			// System.out.println("width:" + WIDTH + "   height:" + HEIGHT);
 
 			int p = (int) WIDTH / 6; // width one slot.
 			// p(0,0) to p(5, 4)

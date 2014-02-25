@@ -22,5 +22,6 @@ public class Main {
 			parser.train();
 		
 		parser.test(filePath);
+		parser.generateOutputFile("output");
 	}
 }
