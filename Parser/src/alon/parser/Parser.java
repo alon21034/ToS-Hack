@@ -159,7 +159,7 @@ public class Parser {
 			PrintWriter out = new PrintWriter(str);
 			for (int i = 0; i < GEM_NUMBER; ++i) {
 				out.print(result[FLAG_COLOR][i] | result[FLAG_WITHER][i] << 4
-						| result[FLAG_ENHANCE][i] << 8);
+						| result[FLAG_ENHANCE][i] << 5);
 				out.print(" ");
 				if (i % 6 == 5)
 					out.println();
