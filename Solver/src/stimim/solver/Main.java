@@ -2,8 +2,6 @@ package stimim.solver;
 
 import java.util.Scanner;
 
-import stimim.solver.Board.Gem;
-
 public class Main {
   public static void main(String[] args) {
     int maxStep = 25;
@@ -40,7 +38,7 @@ public class Main {
 
     for (int r = 0; r < Board.NROW; ++r) {
       for (int c = 0; c < Board.NCOL; ++c) {
-        board.set(r, c, Gem.values()[scanner.nextInt()]);
+        board.set(r, c, scanner.nextInt());
       }
     }
 
