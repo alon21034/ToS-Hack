@@ -25,7 +25,7 @@ for (( i = 0; i < $1; i++ )); do
 
     echo "$i done"
 
-    rm output* features*
+    rm features*
 
     for (( j = 0 ; j < 17 ; j++ )); do
     	sleep 1

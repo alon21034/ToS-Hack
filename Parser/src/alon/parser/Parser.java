@@ -63,7 +63,7 @@ public class Parser {
 			String[] trainArgs0 = { "-c", "15", "-t", "2", "-g", "0.5", "-q",
 					TRAINING_FILE_NAME + FLAG_COLOR };
 			svm_train.main(trainArgs0);
-			String[] trainArgs1 = { "-c", "15", "-t", "0", "-g", "0.5", "-q",
+			String[] trainArgs1 = { "-c", "8", "-t", "2", "-g", "0.5", "-q",
 					TRAINING_FILE_NAME + FLAG_ENHANCE };
 			svm_train.main(trainArgs1);
 			String[] trainArgs2 = { "-c", "10", "-t", "0", "-g", "0.5", "-q",

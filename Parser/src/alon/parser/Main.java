@@ -6,7 +6,7 @@ public class Main {
 
 		boolean isTrainging = false;
 		String filePath = "image_features";
-		
+
 		for (String arg : params) {
 			// System.out.println(arg);
 			if (arg.startsWith("--training")) {
@@ -17,11 +17,12 @@ public class Main {
 		}
 
 		Parser parser = new Parser();
-		
-		if (isTrainging)
+
+		if (isTrainging) {
 			parser.train();
-		
-		parser.test(filePath);
-		parser.generateOutputFile("output");
+		} else {
+			parser.test(filePath);
+			parser.generateOutputFile("output");
+		}
 	}
 }
