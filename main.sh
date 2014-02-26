@@ -16,6 +16,8 @@ for (( i = 0; i < $1; i++ )); do
 	#java -cp ./Tos-Hack/bin Main screen.png
     java -cp Parser/bin/:Parser/libsvm.jar alon.parser.Main screen.png
 
+    cat output
+
 	java -Xmx2g -cp ./Solver/bin stimim.solver.Main < output > step
 
 	echo "$x $y" | ./data/generateTrace $eventnum
