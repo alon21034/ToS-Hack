@@ -1,3 +1,4 @@
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -5,7 +6,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.imageio.ImageIO;
-
 
 public class Main {
 
@@ -58,6 +58,8 @@ public class Main {
 		// p(0,0) to p(5, 4)
 		// p(0,0) = (p, 1280 - 80 -9*p)
 		// p(a, b) = (p+2p, 1200 - (9-2*b)*p)
+
+		totalDiff = 0;
 		for (int i = 0 ; i < 6 ; i++) {
 			for (int j = 0 ; j < 5 ; j++) {
 				// int w = (int)((1+2*i)*p);
@@ -81,8 +83,11 @@ public class Main {
 //				_("(" + i + " ," + j+ "): " + r + " " + g + " " + b);
 
 				res[i][j] = (getType(new int[]{r,g,b}));
+
 			}
 		}
+
+		_("total diff = " + totalDiff);
 
 		PrintWriter out;
         try {
@@ -104,6 +109,8 @@ public class Main {
 
 	}
 
+	public int totalDiff;
+
 	public int getType(int[] input){
 
 		int min = 0, mindiff = 1000;
@@ -119,6 +126,7 @@ public class Main {
 				mindiff = diff;
 			}
 		}
+		totalDiff += mindiff;
 		return min;
 	}
 
