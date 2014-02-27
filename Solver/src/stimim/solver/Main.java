@@ -11,6 +11,7 @@ public class Main {
     int desiredStep = 20;
     
     int requiredCombo = -1;
+    int preferAttack = 0x06;
     
     /**
      * parse args
@@ -29,6 +30,8 @@ public class Main {
         desiredStep = Integer.valueOf(arg.substring("--desired_step=".length()));
       } else if (arg.startsWith("--required_combo=")) {
     	requiredCombo = Integer.valueOf(arg.substring("--required_combo=".length()));
+      } else if (arg.startsWith("--prefer_attack=")) {
+    	preferAttack = Integer.valueOf(arg.substring("--prefer_attack=".length()));
       }
     }
 
@@ -46,6 +49,6 @@ public class Main {
 
     Solver solver = new Solver();
 
-    solver.solve(board, maxStep, desiredStep, true, queueSize, (double) ratioNum / ratioDen, requiredCombo);
+    solver.solve(board, maxStep, desiredStep, true, queueSize, (double) ratioNum / ratioDen, requiredCombo, DamageCalculatorBuilder.getBuiltInDamageCalculator(preferAttack));
   }
 }

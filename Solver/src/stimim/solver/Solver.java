@@ -10,23 +10,33 @@ import java.util.PriorityQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import stimim.solver.Damages.DamageCalculator;
+
 
 public class Solver {
   private static final Logger logger = Logger.getLogger(Solver.class.getName());
   private static final Level level = Level.INFO;
 
+  private static DamageCalculator calculator;
   
   public int solve(Board initBoard, int maxMove, int desiredMove, boolean canMoveDiagonal,
 	      int maxCreated, double pruneRatio) {
 	  return solve(initBoard, maxMove, desiredMove, canMoveDiagonal, maxCreated, pruneRatio, -1);
   }
+
+  public int solve(Board initBoard, int maxMove, int desiredMove, boolean canMoveDiagonal,
+	      int maxCreated, double pruneRatio, int comboNum) {
+	  return solve(initBoard, maxMove, desiredMove, canMoveDiagonal, maxCreated, pruneRatio, 
+			  comboNum, DamageCalculatorBuilder.getDefaultDamageCalculator());
+  }
   
   public int solve(Board initBoard, int maxMove, int desiredMove, boolean canMoveDiagonal,
-      int maxCreated, double pruneRatio, int comboNum) {
+      int maxCreated, double pruneRatio, int comboNum, DamageCalculator damageCalc) {
     Level level = Level.INFO;
     logger.setLevel(Level.ALL);
     int comboUpperBound = (comboNum > 0)? comboNum : initBoard.computeComboUpperBound();
-
+    calculator = damageCalc;
+    
     final Comparator<Step> comparator =
         new Comparator<Step>() {
           @Override
@@ -138,6 +148,7 @@ public class Solver {
     board.print(logger, level);
 
     Damages damages = new Damages();
+    damages.setCalculator(calculator);
     board.computeComboAndRemove(damages);
     board.print(logger, level);
 
