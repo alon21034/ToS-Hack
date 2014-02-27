@@ -13,10 +13,11 @@ while [[ "$yn" != "y" ]]; do
 	adb shell screencap -p /sdcard/screen.png
     adb pull /sdcard/screen.png
 
-	java -cp ./Tos-Hack/bin Main screen.png
+	java -cp Parser/bin/:Parser/libsvm.jar alon.parser.Main screen.png
+	cat output
 
     read -p "required_combo = ?" r_cb
-	java -Xmx2g -cp ./Solver/bin stimim.solver.Main --required_combo=$r_cb < board > step
+	java -Xmx2g -cp ./Solver/bin stimim.solver.Main --required_combo=$r_cb < output > step
 
 	echo "$x $y" | ./data/generateTrace $eventnum
 
