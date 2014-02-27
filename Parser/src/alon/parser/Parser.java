@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
@@ -53,8 +52,9 @@ public class Parser {
 					"Parser/screen_data/", "_result"));
 
 			int[] y = new int[ys0.length];
-			for (int i = 0; i < y.length; i++)
-				y[i] = ys0[i] + ys1[i] * 7;
+			for (int i = 0; i < y.length; i++) {
+        y[i] = ys0[i] + ys1[i] * 7;
+      }
 
 			generateSVMfile(ys0, features, TRAINING_FILE_NAME + FLAG_COLOR);
 			generateSVMfile(ys1, features, TRAINING_FILE_NAME + FLAG_ENHANCE);
@@ -88,8 +88,9 @@ public class Parser {
 					"Parser/screen_data/", "_result"));
 
 			int[] y = new int[ys0.length];
-			for (int i = 0; i < y.length; i++)
-				y[i] = ys0[i] + ys1[i] * 7;
+			for (int i = 0; i < y.length; i++) {
+        y[i] = ys0[i] + ys1[i] * 7;
+      }
 
 			generateSVMfile(ys0, features, TESTING_FILE_NAME + FLAG_COLOR);
 			generateSVMfile(ys1, features, TESTING_FILE_NAME + FLAG_ENHANCE);
@@ -147,22 +148,26 @@ public class Parser {
 		try {
 			Scanner scanner = new Scanner(new File(OUTPUT_FILE_NAME
 					+ FLAG_COLOR));
-			for (int i = 0; i < GEM_NUMBER; ++i)
-				result[FLAG_COLOR][i] = (int) scanner.nextFloat();
+			for (int i = 0; i < GEM_NUMBER; ++i) {
+        result[FLAG_COLOR][i] = (int) scanner.nextFloat();
+      }
 			scanner = new Scanner(new File(OUTPUT_FILE_NAME + FLAG_ENHANCE));
-			for (int i = 0; i < GEM_NUMBER; ++i)
-				result[FLAG_ENHANCE][i] = (int) scanner.nextFloat();
+			for (int i = 0; i < GEM_NUMBER; ++i) {
+        result[FLAG_ENHANCE][i] = (int) scanner.nextFloat();
+      }
 			scanner = new Scanner(new File(OUTPUT_FILE_NAME + FLAG_WITHER));
-			for (int i = 0; i < GEM_NUMBER; ++i)
-				result[FLAG_WITHER][i] = (int) scanner.nextFloat();
+			for (int i = 0; i < GEM_NUMBER; ++i) {
+        result[FLAG_WITHER][i] = (int) scanner.nextFloat();
+      }
 
 			PrintWriter out = new PrintWriter(str);
 			for (int i = 0; i < GEM_NUMBER; ++i) {
 				out.print(result[FLAG_COLOR][i] + result[FLAG_WITHER][i] *16
 						+ result[FLAG_ENHANCE][i] *32);
 				out.print(" ");
-				if (i % 6 == 5)
-					out.println();
+				if (i % 6 == 5) {
+          out.println();
+        }
 			}
 			out.close();
 		} catch (FileNotFoundException e) {
@@ -230,7 +235,7 @@ public class Parser {
 			int HEIGHT = img.getHeight();
 			// System.out.println("width:" + WIDTH + "   height:" + HEIGHT);
 
-			int p = (int) WIDTH / 6; // width one slot.
+			int p = WIDTH / 6; // width one slot.
 			// p(0,0) to p(5, 4)
 			// p(0,0) = (p, 1280 - 80 -9*p)
 			// p(a, b) = (p+2p, 1200 - (9-2*b)*p)
@@ -238,8 +243,8 @@ public class Parser {
 			for (int i = 0; i < 5; i++) {
 				for (int j = 0; j < 6; j++) {
 					int x = (WIDTH * j) / 6;
-					int y = (int) (HEIGHT - HEIGHT * 0.078125 - (5 - i) * WIDTH
-							/ 6);
+					int y = HEIGHT - HEIGHT /16 - (5 - i) * WIDTH
+							/ 6;
 
 					BufferedImage subImage = img.getSubimage(x + p / 4, y + p
 							/ 4, p / 2, p / 2);

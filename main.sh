@@ -8,31 +8,31 @@ x=`grep ABS_MT_POSITION_X tmp | grep 'max [0-9]\+' -o | grep '[0-9]\+' -o`
 y=`grep ABS_MT_POSITION_Y tmp | grep 'max [0-9]\+' -o | grep '[0-9]\+' -o`
 
 for (( i = 0; i < $1; i++ )); do
-	echo "start"
-	
-	adb shell screencap -p /sdcard/screen.png
-    adb pull /sdcard/screen.png
+  echo "start"
 
-	#java -cp ./Tos-Hack/bin Main screen.png
-    java -cp Parser/bin/:Parser/libsvm.jar alon.parser.Main screen.png
+  adb shell screencap -p /sdcard/screen.png
+  adb pull /sdcard/screen.png
 
-    cat output
+  #java -cp ./Tos-Hack/bin Main screen.png
+  java -cp Parser/bin/:Parser/libsvm.jar alon.parser.Main screen.png
 
-	java -Xmx2g -cp ./Solver/bin stimim.solver.Main < output > step
+  cat output
 
-	echo "$x $y" | ./data/generateTrace $eventnum
+  java -Xmx2g -cp ./Solver/bin stimim.solver.Main < output > step
 
-    adb push ./test.sh  /sdcard/test.sh
-    adb shell sh /sdcard/test.sh
+  echo "$x $y" | ./data/generateTrace $eventnum
 
-    echo "$i done"
+  adb push ./test.sh  /sdcard/test.sh
+  adb shell sh /sdcard/test.sh
 
-    rm output* features*
+  echo "$i done"
 
-    for (( j = 0 ; j < 17 ; j++ )); do
-    	sleep 1
-    	echo 'wait'
-    done
-    #read -p "Please input yes/YES to stop this program: " yn
+  rm output* features*
+
+  for (( j = 0 ; j < 17 ; j++ )); do
+    sleep 1
+    echo 'wait'
+  done
+  #read -p "Please input yes/YES to stop this program: " yn
 done
 
