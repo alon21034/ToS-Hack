@@ -22,7 +22,7 @@ for (( i = 0; i < $1; i++ )); do
   echo "$x $y" | ./sendevent/gen_event
   adb push ./events.out /sdcard/events.out
   size=`wc -c ./events.out | grep '[0-9]\+' -o`
-  adb shell "sh /sdcard/sendevent.sh $eventnum $size"
+  adb shell "time sh /sdcard/sendevent.sh $eventnum $size"
 
   echo "$i done"
 
