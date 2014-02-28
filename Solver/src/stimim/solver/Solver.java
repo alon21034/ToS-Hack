@@ -46,7 +46,6 @@ public class Solver {
     Map<String, Step> caches = new HashMap<String, Step>();
     int nCreated = 0;
     int[] maxComboForNumMoves = new int[maxMove + 1];
-    int atThisBest = 0;
 
     logger.log(level, String.format("ComboUpperBound = %d\n", comboUpperBound));
     while (!queue.isEmpty()) {
@@ -56,12 +55,7 @@ public class Solver {
         logger.log(level,
             String.format("Find %f damage, %d combos in %d moves\n", s.damage, s.combo, s.moves));
         best = s;
-        atThisBest = 0;
-      } else if (best.combo == comboUpperBound) {
-        if (s.combo == best.combo && s.damage < best.damage) {
-          atThisBest++;
-        }
-        if (best.moves <= desiredMove || atThisBest > 100) {
+        if (best.combo >= comboUpperBound && best.moves <= desiredMove) {
           break;
         }
       }
