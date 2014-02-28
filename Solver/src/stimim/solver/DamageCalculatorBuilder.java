@@ -19,6 +19,10 @@ public class DamageCalculatorBuilder {
   public static DamageCalculator getAllDarkDamageCalculator() {
     return new DamageCalculatorImpl(0.5, new double[] {0.2, 0.2, 0.2, 0.2, 3, 1}, 1, 1.5, 1);
   }
+  
+  public static DamageCalculator getAllWoodDamageCalculator() {
+	    return new DamageCalculatorImpl(0.5, new double[] {0.1, 3, 0.1, 0.1, 0.1, 1}, 1/2.5, 1, 1);
+  }
 
   public static class DamageCalculatorImpl implements DamageCalculator {
     private final double comboMult;
