@@ -20,7 +20,7 @@ public class Damages {
     }
   }
 
-  private static DamageCalculator CALCULATOR = DamageCalculatorBuilder.getDefaultDamageCalculator();
+  private static DamageCalculator CALCULATOR = DamageCalculatorBuilder.getMultiWoodDamageCalculator();
 
   private int combo;
   private final Damages.RemovedGem[] removedGems;

@@ -1,0 +1,2 @@
+adb shell getevent -lp /dev/input/event$eventnum | grep ABS_MT_POSITION_X tmp | grep 'max [0-9]\+' -o | grep '[0-9]\+' -o
+adb shell getevent -lp /dev/input/event$eventnum | grep ABS_MT_POSITION_Y tmp | grep 'max [0-9]\+' -o | grep '[0-9]\+' -o

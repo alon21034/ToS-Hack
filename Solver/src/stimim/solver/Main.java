@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class Main {
   public static void main(String[] args) {
     int maxStep = 25;
-    int queueSize = 1000000;
+    int queueSize = 500000;
     int ratioNum = 2;
     int ratioDen = 3;
     int desiredStep = 20;

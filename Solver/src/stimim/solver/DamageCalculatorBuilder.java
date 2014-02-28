@@ -13,7 +13,7 @@ public class DamageCalculatorBuilder {
 		private final double bonus;
 
 		private DamageCalculatorImpl(double comboMult, double[] scale,
-				double singleBonus, double multiBonus, double bonus) {
+		        double singleBonus, double multiBonus, double bonus) {
 			this.comboMult = comboMult;
 			this.scale = scale;
 			this.singleBonus = singleBonus;
@@ -31,9 +31,9 @@ public class DamageCalculatorBuilder {
 					continue;
 				}
 				double value = bonus
-						* scale[i]
-						* 0.25
-						* (removed.combo + removed.normal + removed.enhanced + removed.enhanced * 0.6);
+				        * scale[i]
+				        * 0.25
+				        * (removed.combo + removed.normal + removed.enhanced + removed.enhanced * 0.6);
 
 				if (!removed.isMultiAttack) {
 					value *= singleBonus;
@@ -49,83 +49,83 @@ public class DamageCalculatorBuilder {
 
 	public static DamageCalculator getDefaultDamageCalculator() {
 		return new DamageCalculatorImpl(0.5, new double[] { 1, 1, 1, 1, 1, 1 },
-				1, 1, 1);
+		        1, 1, 1);
 	}
 
 	public static DamageCalculator getSingleAtkDamageCalculator() {
 		return new DamageCalculatorImpl(0.5, new double[] { 1, 1, 1, 1, 1, 1 },
-				1, 1 / 6.25, 1);
+		        1, 1 / 6.25, 1);
 	}
 
 	public static DamageCalculator getSingleFireAtkDamageCalculator() {
 		return new DamageCalculatorImpl(0.5, new double[] { 3, 0.1, 0.1, 0.1,
-				0.1, 1 }, 1, 1 / 6.25, 1);
+		        0.1, 1 }, 1, 1 / 6.25, 1);
 	}
 
 	public static DamageCalculator getSingleWoodAtkDamageCalculator() {
 		return new DamageCalculatorImpl(0.5, new double[] { 0.1, 3, 0.1, 0.1,
-				0.1, 1 }, 1, 1 / 6.25, 1);
+		        0.1, 1 }, 1, 1 / 6.25, 1);
 	}
 
 	public static DamageCalculator getSingleWaterAtkDamageCalculator() {
 		return new DamageCalculatorImpl(0.5, new double[] { 0.1, 0.1, 3, 0.1,
-				0.1, 1 }, 1, 1 / 6.25, 1);
+		        0.1, 1 }, 1, 1 / 6.25, 1);
 	}
 
 	public static DamageCalculator getSingleLightAtkDamageCalculator() {
 		return new DamageCalculatorImpl(0.5, new double[] { 0.1, 0.1, 0.1, 3,
-				0.1, 1 }, 1, 1 / 6.25, 1);
+		        0.1, 1 }, 1, 1 / 6.25, 1);
 	}
 
 	public static DamageCalculator getSingleDarkAtkDamageCalculator() {
 		return new DamageCalculatorImpl(0.5, new double[] { 0.1, 0.1, 0.1, 0.1,
-				3, 1 }, 1, 1 / 6.25, 1);
+		        3, 1 }, 1, 1 / 6.25, 1);
 	}
 
 	public static DamageCalculator getSingleHeartAtkDamageCalculator() {
 		return new DamageCalculatorImpl(0.5, new double[] { 0.1, 0.1, 0.1, 0.1,
-				0.1, 3 }, 1, 1 / 6.25, 1);
+		        0.1, 3 }, 1, 1 / 6.25, 1);
 	}
 
 	public static DamageCalculator getMultiAtkDamageCalculator() {
 		return new DamageCalculatorImpl(0.5, new double[] { 1, 1, 1, 1, 1, 1 },
-				1 / 6.25, 1, 1);
+		        1 / 6.25, 1, 1);
 	}
 
 	public static DamageCalculator getMultiFireDamageCalculator() {
 		return new DamageCalculatorImpl(0.5, new double[] { 3, 0.1, 0.1, 0.1,
-				0.1, 1 }, 1 / 6.25, 1, 1);
+		        0.1, 1 }, 1 / 6.25, 1, 1);
 	}
 
 	public static DamageCalculator getMultiWoodDamageCalculator() {
 		return new DamageCalculatorImpl(0.5, new double[] { 0.1, 3, 0.1, 0.1,
-				0.1, 1 }, 1 / 6.25, 1, 1);
+		        0.1, 1 }, 1 / 6.25, 1, 1);
 	}
 
 	public static DamageCalculator getMultiWaterDamageCalculator() {
 		return new DamageCalculatorImpl(0.5, new double[] { 0.1, 0.1, 3, 0.1,
-				0.1, 1 }, 1 / 6.25, 1, 1);
+		        0.1, 1 }, 1 / 6.25, 1, 1);
 	}
 
 	public static DamageCalculator getMultiLightDamageCalculator() {
 		return new DamageCalculatorImpl(0.5, new double[] { 0.1, 0.1, 0.1, 3,
-				0.1, 1 }, 1 / 6.25, 1, 1);
+		        0.1, 1 }, 1 / 6.25, 1, 1);
 	}
 
 	public static DamageCalculator getMultiDarkDamageCalculator() {
 		return new DamageCalculatorImpl(0.5, new double[] { 0.1, 0.1, 0.1, 0.1,
-				3, 1 }, 1 / 6.25, 1, 1);
+		        3, 1 }, 1 / 6.25, 1, 1);
 	}
 
 	public static DamageCalculator getMultiHeartDamageCalculator() {
 		return new DamageCalculatorImpl(0.5, new double[] { 0.1, 0.1, 0.1, 0.1,
-				0.1, 3 }, 1 / 6.25, 1, 1);
+		        0.1, 3 }, 1 / 6.25, 1, 1);
 	}
 
 	public static DamageCalculator getCustomDamageCalculator(double[] arr,
-			boolean preferSingle) {
+	        boolean preferSingle) {
 		return new DamageCalculatorImpl(0.5, arr,
-				(preferSingle) ? 1 : 1 / 6.25, (preferSingle) ? 1 / 6.25 : 1, 1);
+		        (preferSingle) ? 1 : 1 / 6.25, (preferSingle) ? 1 / 6.25 : 1, 1);
 	}
 
 	public static DamageCalculator getBuiltInDamageCalculator(int type) {
