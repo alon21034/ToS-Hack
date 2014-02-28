@@ -30,6 +30,7 @@ int main(int argc, char* argv[]) {
 
   // start
   sendevent(fout, 3, 0x39, 0x00000154);
+  sendevent(fout, 3, 0x30, 0x00000004);
   sendevent(fout, 3, 0x30, 0x00000008);
 
   int W, H;
@@ -43,6 +44,7 @@ int main(int argc, char* argv[]) {
 
   // end
   sendevent(fout, 3, 0x39, 0xffffffff);
+  sendevent(fout, 0, 0x00, 0x00000000);
   sendevent(fout, 0, 0x00, 0x00000000);
   return 0;
 }

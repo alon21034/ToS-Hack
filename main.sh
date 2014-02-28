@@ -13,17 +13,16 @@ for (( i = 0; i < $1; i++ )); do
   adb shell screencap -p /sdcard/screen.png
   adb pull /sdcard/screen.png
 
-  #java -cp ./Tos-Hack/bin Main screen.png
   java -cp Parser/bin/:Parser/libsvm.jar alon.parser.Main screen.png
 
   cat output
 
   java -Xmx2g -cp ./Solver/bin stimim.solver.Main < output > step
 
-  echo "$x $y" | ./data/generateTrace $eventnum
-
-  adb push ./test.sh  /sdcard/test.sh
-  adb shell sh /sdcard/test.sh
+  echo "$x $y" | ./sendevent/gen_event
+  adb push ./events.out /sdcard/events.out
+  size=`wc -c ./events.out | grep '[0-9]\+' -o`
+  adb shell "sh /sdcard/sendevent.sh $eventnum $size"
 
   echo "$i done"
 
