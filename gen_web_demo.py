@@ -24,7 +24,12 @@ def get_solver_result(board):
   output = ""
   for line in board:
     lines += line + "\n"
-  solver = subprocess.Popen(["java", "-jar", "Solver.jar"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+  #solver = subprocess.Popen(["java", "-jar", "Solver.jar", "--queue_size=1500000"],
+  #stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+  #java -Xmx4g -cp ./Solver/bin stimim.solver.Main --queue_size=700000 < output > step
+  solver = subprocess.Popen(
+      ["java", "-Xmx4g", "-cp", "./Solver/bin", "stimim.solver.Main", "--queue_size=2000000"],
+      stdin=subprocess.PIPE, stdout=subprocess.PIPE)
   output += solver.communicate(lines)[0]
   while solver.poll():
     output += solver.communicate()[0]
@@ -40,13 +45,14 @@ board = [raw_input() for i in xrange(5)]
 result = get_solver_result(board);
 
 lines = result.split('\n');
-n = int(lines[0])
-start = read_pair(lines[1])
+n = len(lines)
+start = read_pair(lines[0])
 route = "%d%d," % (start[1], (start[0] + 5))
 prev = start
 
-for i in xrange(1, n):
-  cur = read_pair(lines[1 + i])
+for i in xrange(1, n - 1):
+  print lines[i]
+  cur = read_pair(lines[i])
   dy = cur[0] - prev[0]
   dx = cur[1] - prev[1]
   route += str(dir_to_int(dx, dy))
