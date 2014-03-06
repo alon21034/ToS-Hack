@@ -1,16 +1,18 @@
-eventnum=$1
-size=$2
-blocksize=16
+EVENTNUM=$1
+SIZE=$2
+BLOCKSIZE=16
+COUNT=3
+DELAY=0.05
 
-echo "eventnum: " $eventnum
-echo "size: " $size
+echo "eventnum: " $EVENTNUM
+echo "size: " $SIZE
 
 i=0
-while [[ $(($i * $blocksize)) -lt $size ]]
+while [[ $(($i * $BLOCKSIZE)) -lt $SIZE ]]
 do
-  dd if=/sdcard/events.out of=/dev/input/event$eventnum bs=$blocksize count=3 skip=$i \
+  dd if=/sdcard/events.out of=/dev/input/event$EVENTNUM bs=$BLOCKSIZE count=$COUNT skip=$i \
     > /dev/null 2>&1
-  sleep 0.03
-  i=$(($i + 3))
+  sleep $DELAY
+  i=$(($i + $COUNT))
   echo $i
 done
