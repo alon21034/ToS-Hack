@@ -52,8 +52,9 @@ public class Solver {
       Step s = queue.poll();
       if (best == null || s.damage > best.damage ||
           (s.damage == best.damage && s.moves < best.moves)) {
-        logger.log(level,
-            String.format("Find %f damage, %d combos in %d moves\n", s.damage, s.combo, s.moves));
+        logger.log(level, String.format("Find %f damage, %d/%d combos in %d moves\n", s.damage,
+            s.combo, comboUpperBound, s.moves));
+        logger.log(level, String.format("nCreated: %d/%d", nCreated, maxCreated));
         best = s;
         if (best.combo >= comboUpperBound && best.moves <= desiredMove) {
           break;

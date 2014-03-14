@@ -17,7 +17,7 @@ for (( i = 0; i < $1; i++ )); do
 
   cat output
 
-  java -Xmx2g -cp ./Solver/bin stimim.solver.Main < output > step
+  java -Xmx2g -cp ./Solver/bin stimim.solver.Main --queue_size=500000 < output > step
 
   echo "$x $y" | ./sendevent/gen_event
   adb push ./events.out /sdcard/events.out
