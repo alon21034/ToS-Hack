@@ -15,12 +15,12 @@ public class Solver {
   private static final Logger logger = Logger.getLogger(Solver.class.getName());
   private static final Level level = Level.INFO;
 
-  
+
   public int solve(Board initBoard, int maxMove, int desiredMove, boolean canMoveDiagonal,
 	      int maxCreated, double pruneRatio) {
 	  return solve(initBoard, maxMove, desiredMove, canMoveDiagonal, maxCreated, pruneRatio, -1);
   }
-  
+
   public int solve(Board initBoard, int maxMove, int desiredMove, boolean canMoveDiagonal,
       int maxCreated, double pruneRatio, int comboNum) {
     Level level = Level.INFO;
@@ -46,17 +46,16 @@ public class Solver {
     Map<String, Step> caches = new HashMap<String, Step>();
     int nCreated = 0;
     int[] maxComboForNumMoves = new int[maxMove + 1];
-    int atThisBest = 0;
 
     logger.log(level, String.format("ComboUpperBound = %d\n", comboUpperBound));
     while (!queue.isEmpty()) {
       Step s = queue.poll();
       if (best == null || s.damage > best.damage ||
           (s.damage == best.damage && s.moves < best.moves)) {
-        logger.log(level,
-            String.format("Find %f damage, %d combos in %d moves\n", s.damage, s.combo, s.moves));
+        logger.log(level, String.format("Find %f damage, %d/%d combos in %d moves\n", s.damage,
+            s.combo, comboUpperBound, s.moves));
+        logger.log(level, String.format("nCreated: %d/%d", nCreated, maxCreated));
         best = s;
-
         if (best.combo >= comboUpperBound && best.moves <= desiredMove) {
           break;
         }

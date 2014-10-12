@@ -20,7 +20,8 @@ public class Damages {
     }
   }
 
-  private static DamageCalculator CALCULATOR = DamageCalculatorBuilder.getDefaultDamageCalculator();
+//  private static DamageCalculator CALCULATOR = DamageCalculatorBuilder.getAllDarkDamageCalculator();
+  private static DamageCalculator CALCULATOR = DamageCalculatorBuilder.getSingleAtkDamageCalculator();
 
   private int combo;
   private final Damages.RemovedGem[] removedGems;

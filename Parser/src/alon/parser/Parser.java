@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
@@ -20,7 +19,7 @@ public class Parser {
 	public static final String OUTPUT_FILE_NAME = "output";
 	public static final String FEATURE_FILE_NAME = "features";
 
-	public static final int FEATURE_DIM = 27;
+	public static final int FEATURE_DIM = 108;
 	public static final int GEM_NUMBER = 30;
 	private static final int SCALED_SIZE = 40;
 
@@ -30,7 +29,7 @@ public class Parser {
 	private static final int FLAG_PUZZLE = 3;
 
 	private static final int[] TRAINING_FILES = { 1, 2, 3, 16, 17, 18, 19, 21,
-			22, 25 };
+			22, 25,  5, 10, 11, 12, 20, 24 };
 	private static final int[] TESTING_FILES = { 5, 10, 11, 12, 20, 24 };
 
 	public Parser() {
@@ -53,20 +52,21 @@ public class Parser {
 					"Parser/screen_data/", "_result"));
 
 			int[] y = new int[ys0.length];
-			for (int i = 0; i < y.length; i++)
-				y[i] = ys0[i] + ys1[i] * 7;
+			for (int i = 0; i < y.length; i++) {
+        y[i] = ys0[i] + ys1[i] * 7;
+      }
 
 			generateSVMfile(ys0, features, TRAINING_FILE_NAME + FLAG_COLOR);
 			generateSVMfile(ys1, features, TRAINING_FILE_NAME + FLAG_ENHANCE);
 			generateSVMfile(ys2, features, TRAINING_FILE_NAME + FLAG_WITHER);
 
-			String[] trainArgs0 = { "-c", "15", "-t", "2", "-g", "0.5", "-q",
+			String[] trainArgs0 = { "-c", "10", "-t", "2", "-g", "0.5", "-q",
 					TRAINING_FILE_NAME + FLAG_COLOR };
 			svm_train.main(trainArgs0);
 			String[] trainArgs1 = { "-c", "8", "-t", "2", "-g", "0.5", "-q",
 					TRAINING_FILE_NAME + FLAG_ENHANCE };
 			svm_train.main(trainArgs1);
-			String[] trainArgs2 = { "-c", "10", "-t", "0", "-g", "0.5", "-q",
+			String[] trainArgs2 = { "-c", "20", "-t", "2", "-g", "0.5", "-q",
 					TRAINING_FILE_NAME + FLAG_WITHER };
 			svm_train.main(trainArgs2);
 		} catch (IOException e) {
@@ -88,8 +88,9 @@ public class Parser {
 					"Parser/screen_data/", "_result"));
 
 			int[] y = new int[ys0.length];
-			for (int i = 0; i < y.length; i++)
-				y[i] = ys0[i] + ys1[i] * 7;
+			for (int i = 0; i < y.length; i++) {
+        y[i] = ys0[i] + ys1[i] * 7;
+      }
 
 			generateSVMfile(ys0, features, TESTING_FILE_NAME + FLAG_COLOR);
 			generateSVMfile(ys1, features, TESTING_FILE_NAME + FLAG_ENHANCE);
@@ -147,22 +148,26 @@ public class Parser {
 		try {
 			Scanner scanner = new Scanner(new File(OUTPUT_FILE_NAME
 					+ FLAG_COLOR));
-			for (int i = 0; i < GEM_NUMBER; ++i)
-				result[FLAG_COLOR][i] = (int) scanner.nextFloat();
+			for (int i = 0; i < GEM_NUMBER; ++i) {
+        result[FLAG_COLOR][i] = (int) scanner.nextFloat();
+      }
 			scanner = new Scanner(new File(OUTPUT_FILE_NAME + FLAG_ENHANCE));
-			for (int i = 0; i < GEM_NUMBER; ++i)
-				result[FLAG_ENHANCE][i] = (int) scanner.nextFloat();
+			for (int i = 0; i < GEM_NUMBER; ++i) {
+        result[FLAG_ENHANCE][i] = (int) scanner.nextFloat();
+      }
 			scanner = new Scanner(new File(OUTPUT_FILE_NAME + FLAG_WITHER));
-			for (int i = 0; i < GEM_NUMBER; ++i)
-				result[FLAG_WITHER][i] = (int) scanner.nextFloat();
+			for (int i = 0; i < GEM_NUMBER; ++i) {
+        result[FLAG_WITHER][i] = (int) scanner.nextFloat();
+      }
 
 			PrintWriter out = new PrintWriter(str);
 			for (int i = 0; i < GEM_NUMBER; ++i) {
-				out.print(result[FLAG_COLOR][i] | result[FLAG_WITHER][i] << 4
-						| result[FLAG_ENHANCE][i] << 5);
+				out.print(result[FLAG_COLOR][i] + result[FLAG_WITHER][i] *16
+						+ result[FLAG_ENHANCE][i] *32);
 				out.print(" ");
-				if (i % 6 == 5)
-					out.println();
+				if (i % 6 == 5) {
+          out.println();
+        }
 			}
 			out.close();
 		} catch (FileNotFoundException e) {
@@ -230,7 +235,7 @@ public class Parser {
 			int HEIGHT = img.getHeight();
 			// System.out.println("width:" + WIDTH + "   height:" + HEIGHT);
 
-			int p = (int) WIDTH / 6; // width one slot.
+			int p = WIDTH / 6; // width one slot.
 			// p(0,0) to p(5, 4)
 			// p(0,0) = (p, 1280 - 80 -9*p)
 			// p(a, b) = (p+2p, 1200 - (9-2*b)*p)
@@ -238,8 +243,8 @@ public class Parser {
 			for (int i = 0; i < 5; i++) {
 				for (int j = 0; j < 6; j++) {
 					int x = (WIDTH * j) / 6;
-					int y = (int) (HEIGHT - HEIGHT * 0.078125 - (5 - i) * WIDTH
-							/ 6);
+					int y = HEIGHT - HEIGHT /16 - (5 - i) * WIDTH
+							/ 6;
 
 					BufferedImage subImage = img.getSubimage(x + p / 4, y + p
 							/ 4, p / 2, p / 2);
@@ -272,8 +277,8 @@ public class Parser {
 		}
 
 		int count = 0;
-		for (int i = 10; i < 40; i += 10) {
-			for (int j = 10; j < 40; j += 10) {
+		for (int i = 10; i < 40; i += 5) {
+			for (int j = 10; j < 40; j += 5) {
 
 				int r = 0, g = 0, b = 0;
 

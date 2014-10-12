@@ -22,12 +22,12 @@ public class Main {
 	}
 
 	final int[][] values = {
-			{54, 19, 38}, {62, 44, 49}, // Heart
-			{50, 37, 0}, {61, 50, 14}, // Light
-			{47, 8, 52}, {60, 26, 61}, // Dark
-			{50, 8, 2}, {61, 32, 21}, // Fire
-			{6, 43, 8}, {10, 58, 12}, // Wood
-			{15, 38, 51}, {33, 53, 62}  // Water
+    {50, 8, 2}, {61, 32, 21}, // Fire
+    {6, 43, 8}, {10, 58, 12}, // Wood
+    {15, 38, 51}, {33, 53, 62},  // Water
+    {50, 37, 0}, {61, 50, 14}, // Light
+    {47, 8, 52}, {60, 26, 61}, // Dark
+    {54, 19, 38}, {62, 44, 49}, // Heart
 	};
 
 	public static void main(String[] str) {
@@ -66,7 +66,7 @@ public class Main {
 				int w =  WIDTH/12 + WIDTH*i/6;
 				int h = HEIGHT - HEIGHT/16 -WIDTH/12 - (4-j) * WIDTH/6;
 				// int h = (int)(HEIGHT-HEIGHT/16 - (9-2*j)*p);
-				
+
 				int r=0, g=0, b=0;
 				for (int m = -7 ; m < 8 ; m++) {
 					for (int n = -7 ; n < 8 ; n++) {
